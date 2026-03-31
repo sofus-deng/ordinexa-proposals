@@ -48,6 +48,43 @@ export type {
 } from "./types";
 
 // Internal calculation exports (for advanced use/testing)
+export { getIncludedOptionsList } from "./engine";
+
+/**
+ * Converts a Proposal object to EstimationInput for the estimation engine.
+ * Maps proposal fields to the expected estimation input structure.
+ *
+ * @param proposal - Proposal object with styleOptionId and other fields
+ * @returns EstimationInput ready for calculateEstimate()
+ */
+export function proposalToEstimationInput(proposal: {
+  projectTypeId: string;
+  styleOptionId: string;
+  areaPing: number;
+  meetingRoomCount: number;
+  includeReceptionArea: boolean;
+  includePantry: boolean;
+  includeGlassPartitions: boolean;
+  includeCustomStorage: boolean;
+  includeSmartOfficeSetup: boolean;
+  includeMEPWork: boolean;
+  rushProject: boolean;
+}): import("./types").EstimationInput {
+  return {
+    projectTypeId: proposal.projectTypeId,
+    styleMultiplierId: proposal.styleOptionId,
+    areaPing: proposal.areaPing,
+    meetingRoomCount: proposal.meetingRoomCount,
+    includeReceptionArea: proposal.includeReceptionArea,
+    includePantry: proposal.includePantry,
+    includeGlassPartitions: proposal.includeGlassPartitions,
+    includeCustomStorage: proposal.includeCustomStorage,
+    includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
+    includeMEPWork: proposal.includeMEPWork,
+    rushProject: proposal.rushProject,
+  };
+}
+
 export {
   calculateAreaFactor,
   applyPercentageAdjustment,
