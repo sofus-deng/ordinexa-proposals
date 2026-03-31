@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit",
     "start": "next start",
     "lint": "eslint .",
-    "test": "playwright test",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "node --import tsx --test tests/unit/**/*.test.ts",
+    "test:e2e": "playwright test",
     "postinstall": "prisma generate"
   },
   "dependencies": {
