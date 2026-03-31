@@ -9,7 +9,7 @@ export default function PricingSettingsPage() {
       <div className="space-y-8">
         <PageHeader
           title="Pricing settings"
-          description="Editable-looking pricing controls that establish the commercial operating surface for future calculation and persistence layers."
+          description="Editable-looking pricing controls that establish the interior estimation surface for future calculation and persistence layers."
           action={<Button type="button">Mock save changes</Button>}
         />
 
@@ -17,7 +17,7 @@ export default function PricingSettingsPage() {
           <div className="space-y-6">
             <SectionBlock
               title="Rule set overview"
-              description="The active commercial baseline for Ordinexa Proposals. Persistence and audit history land in later steps."
+              description="The active interior pricing baseline for Ordinexa Proposals. Persistence and audit history land in later steps."
             >
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
@@ -35,7 +35,7 @@ export default function PricingSettingsPage() {
               </div>
             </SectionBlock>
 
-            <Card title="Project type baselines" eyebrow="Base pricing">
+            <Card title="Project type baselines" eyebrow="Budget and timeline baselines">
               <div className="space-y-4">
                 {activePricingRuleSet.projectTypes.map((item) => (
                   <PricingRuleCard key={item.id} item={item} />
@@ -43,15 +43,15 @@ export default function PricingSettingsPage() {
               </div>
             </Card>
 
-            <Card title="Style multipliers" eyebrow="Commercial posture">
+            <Card title="Style options" eyebrow="Interior finish posture">
               <div className="space-y-4">
-                {activePricingRuleSet.styleMultipliers.map((item) => (
+                {activePricingRuleSet.styleOptions.map((item) => (
                   <PricingRuleCard key={item.id} item={item} />
                 ))}
               </div>
             </Card>
 
-            <Card title="Adjustments" eyebrow="Commercial modifiers">
+            <Card title="Adjustments" eyebrow="Budget and timeline modifiers">
               <div className="space-y-4">
                 {activePricingRuleSet.adjustments.map((item) => (
                   <PricingRuleCard key={item.id} item={item} />
@@ -60,7 +60,7 @@ export default function PricingSettingsPage() {
             </Card>
           </div>
 
-          <Card title="Operator notes" eyebrow="Step 1 posture">
+          <Card title="Operator notes" eyebrow="Step 2A posture">
             <div className="space-y-4 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
               <p>{activePricingRuleSet.notes}</p>
               <div className="rounded-[var(--radius-lg)] bg-[var(--color-secondary-soft)] p-4 text-[var(--color-secondary)]">

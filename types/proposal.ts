@@ -20,6 +20,15 @@ export interface Proposal {
   updatedAt: string;
   dueDate: string;
   projectTypeId: string;
-  styleMultiplierId: string;
+  styleOptionId: string;
+  areaPing: number;
+  meetingRoomCount: number;
+  includeReceptionArea: boolean;
+  includePantry: boolean;
+  includeGlassPartitions: boolean;
+  includeCustomStorage: boolean;
+  includeSmartOfficeSetup: boolean;
+  includeMEPWork: boolean;
+  rushProject: boolean;
   estimate: ProposalEstimateSummary;
 }

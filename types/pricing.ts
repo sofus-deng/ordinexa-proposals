@@ -2,11 +2,13 @@ export interface PricingProjectType {
   id: string;
   name: string;
   description: string;
-  baseRate: number;
-  complexityBand: "Core" | "Growth" | "Strategic";
+  budgetBaselineMin: number;
+  budgetBaselineMax: number;
+  timelineBaselineMinWeeks: number;
+  timelineBaselineMaxWeeks: number;
 }
 
-export interface PricingStyleMultiplier {
+export interface PricingStyleOption {
   id: string;
   name: string;
   description: string;
@@ -17,8 +19,9 @@ export interface PricingAdjustment {
   id: string;
   name: string;
   description: string;
-  type: "percentage" | "flat";
-  value: number;
+  budgetImpactType: "percentage" | "flat";
+  budgetImpactValue: number;
+  timelineImpactWeeks: number;
 }
 
 export interface PricingRuleSet {
@@ -29,6 +32,6 @@ export interface PricingRuleSet {
   currency: string;
   notes: string;
   projectTypes: PricingProjectType[];
-  styleMultipliers: PricingStyleMultiplier[];
+  styleOptions: PricingStyleOption[];
   adjustments: PricingAdjustment[];
 }

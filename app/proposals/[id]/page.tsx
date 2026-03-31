@@ -18,7 +18,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
       <div className="space-y-8">
         <PageHeader
           title={proposal.title}
-          description="Believable proposal preview with estimate summary placeholders, structured scope, and pricing context ready for deeper workflow implementation."
+          description="Believable interior proposal preview with estimate placeholders, structured scope, and pricing context ready for deeper implementation."
           action={<ButtonLink href="/proposals/new" variant="secondary">Duplicate into new draft</ButtonLink>}
         />
 
@@ -31,11 +31,11 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             >
               <div className="space-y-5 text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">
                 <p>
-                  {proposal.clientName} is evaluating a structured proposal workspace that improves commercial clarity,
-                  pricing confidence, and readiness for future AI-assisted drafting.
+                  {proposal.clientName} is evaluating an interior project proposal that improves scope clarity,
+                  pricing confidence, and readiness for future estimation outputs.
                 </p>
                 <p>
-                  This Step 1 preview intentionally uses mock-backed values while establishing a modular foundation for
+                  This Step 2A preview intentionally uses mock-backed values while establishing a modular foundation for
                   future estimation logic, persistence, and export flows.
                 </p>
                 <div className="grid gap-4 md:grid-cols-3">
@@ -55,7 +55,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
               </div>
             </Card>
 
-            <SectionBlock title="Scope priorities" description="Structured summary of proposal scope themes for later generation and pricing automation.">
+            <SectionBlock title="Scope priorities" description="Structured summary of fit-out scope themes for later generation and pricing automation.">
               <ul className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
                 {proposal.scope.map((scopeItem) => (
                   <li key={scopeItem} className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
@@ -94,7 +94,9 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                 <p>Created {formatDate(proposal.createdAt)}</p>
                 <p>Last updated {formatDate(proposal.updatedAt)}</p>
                 <p>Industry: {proposal.industry}</p>
-                <p>Commercial detail is mocked today, but the screen is structured for future persistence and estimation engine outputs.</p>
+                <p>Area: {proposal.areaPing} ping</p>
+                <p>Meeting rooms: {proposal.meetingRoomCount}</p>
+                <p>Project detail remains mocked today, but the screen is structured for future persistence and estimation engine outputs.</p>
               </div>
             </Card>
           </div>

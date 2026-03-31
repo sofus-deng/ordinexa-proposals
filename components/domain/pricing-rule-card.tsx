@@ -1,19 +1,23 @@
-import type { PricingAdjustment, PricingProjectType, PricingStyleMultiplier } from "@/types";
+import type { PricingAdjustment, PricingProjectType, PricingStyleOption } from "@/types";
 
 import { formatCurrency } from "@/lib/format";
 
-type Item = PricingProjectType | PricingStyleMultiplier | PricingAdjustment;
+type Item = PricingProjectType | PricingStyleOption | PricingAdjustment;
 
 function getValue(item: Item) {
-  if ("baseRate" in item) {
-    return formatCurrency(item.baseRate);
+  if ("budgetBaselineMin" in item) {
+    return `${formatCurrency(item.budgetBaselineMin)} - ${formatCurrency(item.budgetBaselineMax)} · ${item.timelineBaselineMinWeeks}-${item.timelineBaselineMaxWeeks} wks`;
   }
 
   if ("multiplier" in item) {
     return `${item.multiplier.toFixed(2)}x`;
   }
 
-  return item.type === "flat" ? formatCurrency(item.value) : `${item.value}%`;
+  const budgetImpact = item.budgetImpactType === "flat"
+    ? formatCurrency(item.budgetImpactValue)
+    : `${item.budgetImpactValue}%`;
+
+  return `${budgetImpact} · ${item.timelineImpactWeeks} wk`;
 }
 
 export function PricingRuleCard({ item }: { item: Item }) {
