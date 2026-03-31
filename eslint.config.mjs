@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy nested directory artifacts from initial setup:
+    "ordinexa-proposals/**",
+    "node_modules/**",
   ]),
 ]);
 
