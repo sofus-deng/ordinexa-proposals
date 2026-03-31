@@ -19,12 +19,32 @@ Open [http://localhost:3000](http://localhost:3000). The root route redirects to
 - `/proposals/[id]`
 - `/settings/pricing`
 
-## Local notes
+## Validation Commands
+
+Run these commands before pushing changes:
+
+```bash
+# Individual checks
+pnpm typecheck   # TypeScript type checking
+pnpm lint        # ESLint code linting
+pnpm test:unit   # Unit tests
+pnpm test:e2e    # End-to-end tests (requires dev server)
+pnpm build       # Production build
+
+# Combined commands
+pnpm test        # Run unit + e2e tests
+pnpm validate    # Run all checks (typecheck + lint + tests + build)
+```
+
+### Pre-push Checklist
+
+Run `pnpm validate` to ensure all checks pass before pushing.
+
+## Project Notes
 
 - Planning docs live under `plans/`
 - UI is powered by mock domain data in Step 1
 - Prisma and PostgreSQL are scaffolded as the persistence foundation for later steps
-- Use `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` before shipping
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to load Geist for a calm enterprise UI baseline.
 
