@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProposalStatus {
+  DRAFT
+  REVIEW
+  SENT
+  WON
+  ARCHIVED
+}
+
+enum PricingAdjustmentType {
+  PERCENTAGE
+  FLAT
+}
+
+model Proposal {
+  id                 String   @id @default(cuid())
+  title              String
+  clientName         String
+  contactName        String
+  industry           String
+  status             ProposalStatus @default(DRAFT)
+  summary            String
+  scope              Json
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  dueDate            DateTime
+  estimateSubtotal   Int
+  estimateAdjustment Int
+  estimateTotal      Int
+  confidenceLabel    String
+  projectTypeId      String
+  styleMultiplierId  String
+
+  projectType        PricingProjectType      @relation(fields: [projectTypeId], references: [id])
+  styleMultiplier    PricingStyleMultiplier  @relation(fields: [styleMultiplierId], references: [id])
+}
+
+model PricingRuleSet {
+  id               String                   @id @default(cuid())
+  name             String
+  status           String
+  effectiveFrom    DateTime
+  currency         String
+  notes            String
+  projectTypes     PricingProjectType[]
+  styleMultipliers PricingStyleMultiplier[]
+  adjustments      PricingAdjustment[]
+}
+
+model PricingProjectType {
+  id             String      @id
+  name           String
+  description    String
+  baseRate       Int
+  complexityBand String
+  ruleSetId      String
+  ruleSet        PricingRuleSet @relation(fields: [ruleSetId], references: [id])
+  proposals      Proposal[]
+}
+
+model PricingStyleMultiplier {
+  id          String      @id
+  name        String
+  description String
+  multiplier  Float
+  ruleSetId   String
+  ruleSet     PricingRuleSet @relation(fields: [ruleSetId], references: [id])
+  proposals   Proposal[]
+}
+
+model PricingAdjustment {
+  id          String                @id
+  name        String
+  description String
+  type        PricingAdjustmentType
+  value       Float
+  ruleSetId   String
+  ruleSet     PricingRuleSet        @relation(fields: [ruleSetId], references: [id])
+}

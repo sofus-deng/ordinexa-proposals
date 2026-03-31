@@ -1,0 +1,55 @@
+import { AppShell } from "@/components/layout/app-shell";
+import { ProposalListCard, StatChip } from "@/components/domain";
+import { ButtonLink, Card, PageHeader } from "@/components/ui";
+import { proposals } from "@/data";
+
+const totalPipeline = proposals.reduce((total, proposal) => total + proposal.estimate.estimatedTotal, 0);
+
+export default function DashboardPage() {
+  return (
+    <AppShell>
+      <div className="space-y-8">
+        <PageHeader
+          title="Dashboard"
+          description="Monitor proposal momentum, track commercial status, and move quickly into structured proposal creation."
+          action={<ButtonLink href="/proposals/new">Create new proposal</ButtonLink>}
+        />
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatChip label="Open proposals" value={`${proposals.length}`} tone="primary" />
+          <StatChip label="In review" value={`${proposals.filter((proposal) => proposal.status === "review").length}`} />
+          <StatChip label="Sent this cycle" value={`${proposals.filter((proposal) => proposal.status === "sent").length}`} tone="secondary" />
+          <StatChip label="Pipeline value" value={`$${Math.round(totalPipeline / 1000)}k`} />
+        </section>
+
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_380px]">
+          <Card title="Active proposals" eyebrow="Proposal pipeline">
+            <div className="space-y-4">
+              {proposals.map((proposal) => (
+                <ProposalListCard key={proposal.id} proposal={proposal} />
+              ))}
+            </div>
+          </Card>
+
+          <Card title="Workspace signals" eyebrow="Operating view">
+            <div className="space-y-5 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+              <div className="rounded-[var(--radius-lg)] bg-[var(--color-primary-soft)] p-4 text-[var(--color-primary-emphasis)]">
+                <p className="font-semibold">Strong CTA ready</p>
+                <p className="mt-1 leading-6">Guide sellers into a consistent intake flow before the estimation engine and AI generation land in later steps.</p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">What Step 1 establishes</p>
+                <ul className="space-y-3 leading-6">
+                  <li>Structured route foundation for dashboard, new proposal, detail preview, and pricing administration.</li>
+                  <li>Light-first semantic design tokens for future expansion, including near-free dark mode preparation.</li>
+                  <li>Mock-backed domain data shaped to swap cleanly to Prisma repositories later.</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
