@@ -3,13 +3,17 @@ import type { ReactNode } from "react";
 interface FieldWrapperProps {
   label: string;
   hint?: string;
+  required?: boolean;
   children: ReactNode;
 }
 
-export function FieldWrapper({ label, hint, children }: FieldWrapperProps) {
+export function FieldWrapper({ label, hint, required, children }: FieldWrapperProps) {
   return (
     <label className="flex flex-col gap-2">
-      <span className="text-[var(--text-sm)] font-medium text-[var(--color-text-primary)]">{label}</span>
+      <span className="text-[var(--text-sm)] font-medium text-[var(--color-text-primary)]">
+        {label}
+        {required && <span className="ml-1 text-red-500">*</span>}
+      </span>
       {children}
       {hint ? <span className="text-[var(--text-xs)] leading-5 text-[var(--color-text-muted)]">{hint}</span> : null}
     </label>
