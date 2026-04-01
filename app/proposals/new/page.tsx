@@ -13,11 +13,24 @@ import {
 } from "@/components/ui";
 import { projectTypes, styleOptions, activePricingRuleSet } from "@/data";
 import {
+  createMockProvider,
+  createProvider,
+  generateProposal,
+  isProviderAvailable,
+} from "@/lib/ai-generation";
+import {
   calculateEstimate,
   createMockPricingRepository,
   validateEstimationInput,
 } from "@/lib/estimation";
 import type { EstimationInput, EstimateSummary } from "@/lib/estimation";
+import type {
+  AIGenerationConfig,
+  GeneratedProposalContent,
+  ProposalGenerationInput,
+  RiskOrAssumption,
+  SpatialRecommendation,
+} from "@/types/proposal-generation";
 
 /**
  * Default form state for estimation inputs
@@ -35,6 +48,342 @@ const defaultFormData: EstimationInput = {
   includeMEPWork: false,
   rushProject: false,
 };
+
+type ProviderOption = AIGenerationConfig["provider"];
+
+const providerOptions: Array<{ value: ProviderOption; label: string; description: string }> = [
+  {
+    value: "gemini",
+    label: "Gemini-first",
+    description: "Uses Gemini when available, with automatic mock fallback if unavailable.",
+  },
+  {
+    value: "mock",
+    label: "Mock preview",
+    description: "Deterministic local proposal generation for demos and development.",
+  },
+];
+
+function toTitleCase(value: string): string {
+  return value
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function getSelectedScopeLabels(input: EstimationInput): string[] {
+  return [
+    input.includeReceptionArea ? "Reception area" : null,
+    input.includePantry ? "Pantry facilities" : null,
+    input.includeGlassPartitions ? "Glass partitions" : null,
+    input.includeCustomStorage ? "Custom storage" : null,
+    input.includeSmartOfficeSetup ? "Smart office setup" : null,
+    input.includeMEPWork ? "MEP work" : null,
+    input.rushProject ? "Rush project delivery" : null,
+  ].filter((value): value is string => Boolean(value));
+}
+
+function buildProposalGenerationInput(
+  formData: EstimationInput,
+  estimate: EstimateSummary
+): ProposalGenerationInput {
+  const selectedScope = getSelectedScopeLabels(formData);
+
+  return {
+    projectContext: {
+      title: `${estimate.projectType.name} Proposal`,
+      clientName: "Prospective Client",
+      contactName: "Project Lead",
+      industry: "Commercial Workplace",
+      projectTypeName: estimate.projectType.name,
+      styleOptionName: estimate.styleOption.name,
+      scope: [
+        `${estimate.projectType.name} for ${estimate.input.areaPing} ping`,
+        `${estimate.input.meetingRoomCount} meeting room${estimate.input.meetingRoomCount === 1 ? "" : "s"}`,
+        ...selectedScope,
+      ],
+    },
+    estimationContext: {
+      areaPing: estimate.input.areaPing,
+      meetingRoomCount: estimate.input.meetingRoomCount,
+      includedOptions: estimate.input.includedOptions,
+      budgetRange: {
+        min: estimate.budget.final.min,
+        max: estimate.budget.final.max,
+        currency: estimate.currency,
+      },
+      timelineRange: {
+        minWeeks: estimate.timeline.final.minWeeks,
+        maxWeeks: estimate.timeline.final.maxWeeks,
+      },
+      styleMultiplier: estimate.styleOption.multiplier,
+      isRushProject: formData.rushProject,
+    },
+    fitOutOptions: {
+      includeReceptionArea: formData.includeReceptionArea,
+      includePantry: formData.includePantry,
+      includeGlassPartitions: formData.includeGlassPartitions,
+      includeCustomStorage: formData.includeCustomStorage,
+      includeSmartOfficeSetup: formData.includeSmartOfficeSetup,
+      includeMEPWork: formData.includeMEPWork,
+    },
+    domainContext: {
+      designPreferences: [estimate.styleOption.name, estimate.projectType.name],
+      specialRequirements: selectedScope,
+    },
+  };
+}
+
+async function generateProposalWithFallback(
+  input: ProposalGenerationInput,
+  selectedProvider: ProviderOption
+): Promise<GeneratedProposalContent> {
+  if (selectedProvider === "mock") {
+    return generateProposal(createMockProvider({ deterministic: true }), input);
+  }
+
+  const geminiProvider = createProvider({
+    provider: "gemini",
+    temperature: 0.7,
+  });
+
+  if (await isProviderAvailable(geminiProvider)) {
+    try {
+      return await generateProposal(geminiProvider, input);
+    } catch (error) {
+      console.warn("Gemini generation failed, falling back to mock provider.", error);
+    }
+  }
+
+  return generateProposal(createMockProvider({ deterministic: true }), input);
+}
+
+function PreviewSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
+      <div className="mb-4 space-y-1">
+        <h3 className="text-[var(--text-base)] font-semibold text-[var(--color-text-primary)]">{title}</h3>
+        {description ? (
+          <p className="text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">{description}</p>
+        ) : null}
+      </div>
+      <div className="space-y-4 text-[var(--text-sm)] leading-6 text-[var(--color-text-primary)]">{children}</div>
+    </section>
+  );
+}
+
+function PreviewList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li key={item} className="flex gap-3">
+          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ImpactBadge({ impact }: { impact: RiskOrAssumption["impact"] }) {
+  const tone = {
+    low: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    medium: "bg-amber-50 text-amber-700 ring-amber-200",
+    high: "bg-rose-50 text-rose-700 ring-rose-200",
+  }[impact];
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 ${tone}`}>
+      {impact}
+    </span>
+  );
+}
+
+function RecommendationCard({ recommendation }: { recommendation: SpatialRecommendation }) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">{recommendation.area}</p>
+      </div>
+      <p className="mt-2 text-[var(--text-sm)] text-[var(--color-text-primary)]">{recommendation.recommendation}</p>
+      <p className="mt-2 text-[var(--text-xs)] leading-6 text-[var(--color-text-secondary)]">{recommendation.rationale}</p>
+    </div>
+  );
+}
+
+function RiskAssumptionList({
+  title,
+  items,
+}: {
+  title: string;
+  items: RiskOrAssumption[];
+}) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">{title}</p>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div
+            key={`${title}-${item.description}`}
+            className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="font-medium text-[var(--color-text-primary)]">{item.description}</p>
+              <ImpactBadge impact={item.impact} />
+            </div>
+            <p className="mt-2 text-[var(--text-xs)] leading-6 text-[var(--color-text-secondary)]">
+              {item.mitigationOrValidation}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProposalPreview({ content }: { content: GeneratedProposalContent }) {
+  return (
+    <div className="space-y-5">
+      <PreviewSection
+        title="Executive summary"
+        description="High-level positioning for the current project brief, budget, and timeline context."
+      >
+        <p>{content.executiveSummary.overview}</p>
+        <p>{content.executiveSummary.valueProposition}</p>
+        <p>{content.executiveSummary.recommendation}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Project understanding">
+        <p>{content.projectUnderstanding.businessContext}</p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Objectives
+            </p>
+            <PreviewList items={content.projectUnderstanding.objectives} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Constraints
+            </p>
+            <PreviewList items={content.projectUnderstanding.constraints} />
+          </div>
+        </div>
+        <p>{content.projectUnderstanding.spatialRequirements}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Design direction">
+        <p>{content.designDirection.philosophy}</p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Materials & finishes
+            </p>
+            <PreviewList items={content.designDirection.materialsFinishes} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Furniture & equipment
+            </p>
+            <PreviewList items={content.designDirection.furnitureEquipment} />
+          </div>
+        </div>
+        <p><span className="font-semibold">Color palette:</span> {content.designDirection.colorPalette}</p>
+        <p><span className="font-semibold">Lighting approach:</span> {content.designDirection.lightingApproach}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Spatial planning recommendations">
+        <p>{content.spatialPlanningRecommendations.overallStrategy}</p>
+        <div className="space-y-3">
+          {content.spatialPlanningRecommendations.areaRecommendations.map((recommendation) => (
+            <RecommendationCard
+              key={`${recommendation.area}-${recommendation.recommendation}`}
+              recommendation={recommendation}
+            />
+          ))}
+        </div>
+        <p><span className="font-semibold">Circulation flow:</span> {content.spatialPlanningRecommendations.circulationFlow}</p>
+        <p><span className="font-semibold">Flexibility:</span> {content.spatialPlanningRecommendations.flexibilityConsiderations}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Budget narrative">
+        <p>{content.budgetNarrative.overview}</p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Cost breakdown
+            </p>
+            <PreviewList items={content.budgetNarrative.costBreakdown} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Value engineering
+            </p>
+            <PreviewList items={content.budgetNarrative.valueEngineeringOptions} />
+          </div>
+        </div>
+        <p>{content.budgetNarrative.confidenceExplanation}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Timeline narrative">
+        <p>{content.timelineNarrative.overview}</p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Milestones
+            </p>
+            <PreviewList items={content.timelineNarrative.milestones} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Critical path
+            </p>
+            <PreviewList items={content.timelineNarrative.criticalPath} />
+          </div>
+        </div>
+        <p>{content.timelineNarrative.confidenceExplanation}</p>
+      </PreviewSection>
+
+      <PreviewSection title="Risks and assumptions">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <RiskAssumptionList title="Risks" items={content.risksAndAssumptions.risks} />
+          <RiskAssumptionList title="Assumptions" items={content.risksAndAssumptions.assumptions} />
+        </div>
+      </PreviewSection>
+
+      <PreviewSection title="Recommended next steps">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Immediate
+            </p>
+            <PreviewList items={content.recommendedNextSteps.immediate} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Short term
+            </p>
+            <PreviewList items={content.recommendedNextSteps.shortTerm} />
+          </div>
+          <div>
+            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              Decision points
+            </p>
+            <PreviewList items={content.recommendedNextSteps.decisionPoints} />
+          </div>
+        </div>
+      </PreviewSection>
+    </div>
+  );
+}
 
 /**
  * Formats a budget range for display
@@ -69,6 +418,10 @@ export default function NewProposalPage() {
   const [estimate, setEstimate] = useState<EstimateSummary | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<ProviderOption>("gemini");
+  const [generatedProposal, setGeneratedProposal] = useState<GeneratedProposalContent | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
 
   const repository = useMemo(() => createMockPricingRepository(), []);
 
@@ -78,11 +431,13 @@ export default function NewProposalPage() {
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setValidationErrors([]);
+    setGenerationError(null);
   }, []);
 
   const toggleBoolean = useCallback((field: keyof EstimationInput) => {
     setFormData((prev) => ({ ...prev, [field]: !prev[field] }));
     setValidationErrors([]);
+    setGenerationError(null);
   }, []);
 
   const handleCalculateEstimate = useCallback(async () => {
@@ -98,6 +453,7 @@ export default function NewProposalPage() {
     try {
       const result = await calculateEstimate(repository, formData);
       setEstimate(result);
+      setGeneratedProposal(null);
     } catch (error) {
       console.error("Estimation failed:", error);
       setValidationErrors(["Failed to calculate estimate. Please try again."]);
@@ -106,12 +462,48 @@ export default function NewProposalPage() {
     }
   }, [formData, repository]);
 
+  const handleGenerateProposal = useCallback(async () => {
+    const errors = validateEstimationInput(formData);
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors([]);
+    setGenerationError(null);
+    setIsGeneratingProposal(true);
+
+    try {
+      let resolvedEstimate = estimate;
+
+      if (!resolvedEstimate) {
+        resolvedEstimate = await calculateEstimate(repository, formData);
+        setEstimate(resolvedEstimate);
+      }
+
+      if (!resolvedEstimate) {
+        throw new Error("Estimate generation failed before proposal generation.");
+      }
+
+      const input = buildProposalGenerationInput(formData, resolvedEstimate);
+      const content = await generateProposalWithFallback(input, selectedProvider);
+
+      setGeneratedProposal(content);
+    } catch (error) {
+      console.error("Proposal generation failed:", error);
+      setGenerationError("Failed to generate proposal content. Please retry.");
+    } finally {
+      setIsGeneratingProposal(false);
+    }
+  }, [estimate, formData, repository, selectedProvider]);
+
   return (
     <AppShell>
       <div className="space-y-8">
         <PageHeader
           title="New proposal"
-          description="Configure the interior fit-out parameters to generate a deterministic budget and timeline estimate."
+          description="Configure the interior fit-out parameters, generate a deterministic estimate, and preview structured AI proposal content in one polished flow."
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_400px]">
@@ -238,6 +630,48 @@ export default function NewProposalPage() {
                 </div>
               </SectionBlock>
 
+              <SectionBlock
+                title="Proposal generation"
+                description="Choose the generation path for the proposal preview. Gemini is preferred, with mock fallback kept available for reliable demos."
+              >
+                <div className="space-y-3">
+                  {providerOptions.map((option) => {
+                    const isSelected = selectedProvider === option.value;
+
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setSelectedProvider(option.value)}
+                        className={`w-full rounded-[var(--radius-lg)] border p-4 text-left transition-all ${
+                          isSelected
+                            ? "border-[var(--color-accent)] bg-[var(--color-accent-subtle)]"
+                            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-hover)]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-[var(--text-sm)] font-medium text-[var(--color-text-primary)]">{option.label}</p>
+                            <p className="mt-1 text-[var(--text-xs)] leading-5 text-[var(--color-text-secondary)]">
+                              {option.description}
+                            </p>
+                          </div>
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${
+                              isSelected
+                                ? "bg-white text-[var(--color-accent)]"
+                                : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
+                            }`}
+                          >
+                            {toTitleCase(option.value)}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </SectionBlock>
+
               {validationErrors.length > 0 && (
                 <div className="rounded-[var(--radius-lg)] bg-red-50 border border-red-200 p-4">
                   <p className="text-[var(--text-sm)] font-medium text-red-800">Please fix the following issues:</p>
@@ -249,9 +683,23 @@ export default function NewProposalPage() {
                 </div>
               )}
 
+              {generationError && (
+                <div className="rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-[var(--text-sm)] font-medium text-amber-800">Proposal generation issue</p>
+                  <p className="mt-1 text-[var(--text-sm)] text-amber-700">{generationError}</p>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-3">
                 <Button type="submit" disabled={isCalculating}>
                   {isCalculating ? "Calculating..." : "Generate estimate"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleGenerateProposal}
+                  disabled={isGeneratingProposal}
+                >
+                  {isGeneratingProposal ? "Generating proposal..." : "Generate proposal preview"}
                 </Button>
                 <Button
                   type="button"
@@ -259,7 +707,10 @@ export default function NewProposalPage() {
                   onClick={() => {
                     setFormData(defaultFormData);
                     setEstimate(null);
+                    setGeneratedProposal(null);
+                    setGenerationError(null);
                     setValidationErrors([]);
+                    setSelectedProvider("gemini");
                   }}
                 >
                   Reset form
@@ -421,9 +872,9 @@ export default function NewProposalPage() {
                   )}
                 </div>
               ) : (
-                <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
-                  <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
-                    <p className="text-[var(--color-text-primary)]">No estimate generated yet</p>
+              <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
+                  <p className="text-[var(--color-text-primary)]">No estimate generated yet</p>
                     <p className="mt-1">Configure the project parameters and click Generate estimate to see results.</p>
                   </div>
                   <div className="space-y-2">
@@ -433,6 +884,53 @@ export default function NewProposalPage() {
                       <li>Enter area and meeting room count for scope sizing.</li>
                       <li>Toggle scope options to adjust the estimate.</li>
                       <li>Mark as rush for compressed timeline pricing.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            <Card title="Proposal preview" eyebrow="Generated content">
+              {generatedProposal ? (
+                <div className="space-y-5">
+                  <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">
+                          Structured proposal ready for review
+                        </p>
+                        <p className="mt-1 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
+                          Provider: {toTitleCase(generatedProposal.metadata.provider)} · Model: {generatedProposal.metadata.modelUsed}
+                        </p>
+                      </div>
+                      <span className="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+                        {new Date(generatedProposal.metadata.generatedAt).toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <ProposalPreview content={generatedProposal} />
+                </div>
+              ) : (
+                <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                  <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
+                    <p className="text-[var(--color-text-primary)]">No proposal preview generated yet</p>
+                    <p className="mt-1">
+                      Use the current form inputs and estimate context to generate structured proposal sections directly on this page.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-[var(--color-text-primary)]">Preview includes</p>
+                    <ul className="space-y-2 leading-6">
+                      <li>Executive summary and project understanding</li>
+                      <li>Design direction and spatial planning recommendations</li>
+                      <li>Budget and timeline narratives grounded in current estimate results</li>
+                      <li>Risks, assumptions, and recommended next steps</li>
                     </ul>
                   </div>
                 </div>
