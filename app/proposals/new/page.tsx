@@ -925,7 +925,7 @@ export default function NewProposalPage() {
                             ? "text-emerald-800"
                             : "text-amber-800"
                         }`}>
-                          {providerStatus.isAvailable ? "AI generation ready" : "Demo mode active"}
+                          {providerStatus.isAvailable ? "Ready to generate" : "Demo mode"}
                         </p>
                         <p className={`mt-1 text-[var(--text-xs)] leading-5 ${
                           providerStatus.isAvailable

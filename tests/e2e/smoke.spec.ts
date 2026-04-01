@@ -24,8 +24,8 @@ test("renders proposal detail route", async ({ page }) => {
 test("renders pricing settings route", async ({ page }) => {
   await page.goto("/settings/pricing");
   await expect(page.getByRole("heading", { name: "Pricing settings" })).toBeVisible();
-  await expect(page.getByText("Project type baselines")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Mock save changes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Project type baselines" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save changes" })).toBeVisible();
 });
 
 // ORDX-016A: Playwright coverage for new proposal estimation flow

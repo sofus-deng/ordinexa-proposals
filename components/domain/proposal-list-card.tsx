@@ -26,7 +26,7 @@ export function ProposalListCard({ proposal }: ProposalListCardProps) {
           <StatusBadge status={proposal.status} />
           {hasAiContent && (
             <span className="inline-flex items-center rounded-full bg-[var(--color-primary-soft)] px-2 py-0.5 text-xs font-medium text-[var(--color-primary-emphasis)]">
-              AI Generated
+              Generated
             </span>
           )}
         </div>

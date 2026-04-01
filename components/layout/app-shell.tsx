@@ -54,9 +54,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="mt-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
-            <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">Step 1 foundation</p>
+            <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">Workspace overview</p>
             <p className="mt-1 text-[var(--text-xs)] leading-5 text-[var(--color-text-secondary)]">
-              Mock-backed workflow ready for later estimation engine and AI proposal generation.
+              Create proposals, review estimates, and manage your project pipeline.
             </p>
           </div>
         </aside>
@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <p className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
                   Ordinexa Workspace
                 </p>
-                <h1 className="text-[var(--text-lg)] font-semibold text-[var(--color-text-primary)]">Premium proposal operations foundation</h1>
+                <h1 className="text-[var(--text-lg)] font-semibold text-[var(--color-text-primary)]">Proposals</h1>
               </div>
 
               <nav className="flex flex-wrap gap-2 lg:hidden">
@@ -94,10 +94,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
               <div className="flex items-center gap-3">
                 <div className="rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-[var(--text-xs)] font-semibold text-[var(--color-text-secondary)]">
-                  Light-first system
+                  Demo
                 </div>
                 <div className="hidden rounded-[var(--radius-full)] bg-[var(--color-primary-soft)] px-3 py-2 text-[var(--text-xs)] font-semibold text-[var(--color-primary-emphasis)] sm:block">
-                  Pricing + proposals
+                  Workspace
                 </div>
               </div>
             </div>

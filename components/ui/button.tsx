@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 
 const buttonStyles = {
   primary:
-    "bg-[var(--color-primary)] text-white shadow-[var(--shadow-sm)] hover:bg-[var(--color-primary-emphasis)]",
+    "bg-[var(--color-primary)] !text-white shadow-[var(--shadow-sm)] hover:bg-[var(--color-primary-emphasis)]",
   secondary:
     "bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]",
   ghost: "bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)]",

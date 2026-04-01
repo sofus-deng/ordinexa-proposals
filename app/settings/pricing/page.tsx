@@ -9,15 +9,15 @@ export default function PricingSettingsPage() {
       <div className="space-y-8">
         <PageHeader
           title="Pricing settings"
-          description="Editable-looking pricing controls that establish the interior estimation surface for future calculation and persistence layers."
-          action={<Button type="button">Mock save changes</Button>}
+          description="Configure pricing rules and baselines for project estimation."
+          action={<Button type="button">Save changes</Button>}
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_360px]">
           <div className="space-y-6">
             <SectionBlock
               title="Rule set overview"
-              description="The active interior pricing baseline for Ordinexa Proposals. Persistence and audit history land in later steps."
+              description="Active pricing baseline for proposal estimation."
             >
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
@@ -60,16 +60,16 @@ export default function PricingSettingsPage() {
             </Card>
           </div>
 
-          <Card title="Operator notes" eyebrow="Step 2A posture">
+          <Card title="Notes" eyebrow="Reference">
             <div className="space-y-4 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
               <p>{activePricingRuleSet.notes}</p>
               <div className="rounded-[var(--radius-lg)] bg-[var(--color-secondary-soft)] p-4 text-[var(--color-secondary)]">
-                Pricing sections are intentionally editable-looking to support realistic smoke coverage before save flows exist.
+                Pricing rules establish the baseline for budget and timeline calculations in new proposals.
               </div>
               <ul className="space-y-2">
-                <li>Schema and types are aligned for a future Prisma repository implementation.</li>
-                <li>UI remains mock-backed in this step to avoid blocking on live PostgreSQL setup.</li>
-                <li>Field structure is ready for future validation, versioning, and approval workflows.</li>
+                <li>Project type baselines define default budget and timeline ranges.</li>
+                <li>Style options adjust estimates based on finish level and complexity.</li>
+                <li>Adjustments provide modifiers for project-specific factors.</li>
               </ul>
             </div>
           </Card>
