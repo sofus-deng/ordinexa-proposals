@@ -11,11 +11,15 @@
   --color-primary-soft: #e6efff;
   --color-secondary: #0f9a8a;
   --color-secondary-soft: #e6f8f6;
+  --color-accent: #246bff;
+  --color-accent-emphasis: #1450d2;
+  --color-accent-subtle: #e6efff;
   --color-text-primary: #152235;
   --color-text-secondary: #415168;
   --color-text-muted: #6d7b8f;
   --color-border: #dbe4ee;
   --color-border-strong: #c4d1de;
+  --color-border-hover: #c8d6e6;
   --color-success: #15803d;
   --color-warning: #b45309;
   --color-danger: #b42318;
@@ -66,11 +70,15 @@
   --color-primary-soft: var(--color-primary-soft);
   --color-secondary: var(--color-secondary);
   --color-secondary-soft: var(--color-secondary-soft);
+  --color-accent: var(--color-accent);
+  --color-accent-emphasis: var(--color-accent-emphasis);
+  --color-accent-subtle: var(--color-accent-subtle);
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
   --color-border: var(--color-border);
   --color-border-strong: var(--color-border-strong);
+  --color-border-hover: var(--color-border-hover);
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);
   --color-danger: var(--color-danger);
@@ -115,6 +123,7 @@ textarea {
 
 /* Print Styles (ORDX-025C) */
 @media print {
+
   /* Hide non-printable elements */
   .print\:hidden {
     display: none !important;
@@ -146,12 +155,22 @@ textarea {
   }
 
   /* Improve text readability */
-  p, li, td, th, span, div {
+  p,
+  li,
+  td,
+  th,
+  span,
+  div {
     color: black !important;
   }
 
   /* Ensure headings are visible */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: black !important;
     page-break-after: avoid;
   }
@@ -164,7 +183,12 @@ textarea {
   }
 
   /* Avoid page breaks after headings */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     break-after: avoid;
     page-break-after: avoid;
   }

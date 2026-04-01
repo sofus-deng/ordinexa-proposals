@@ -59,10 +59,10 @@ function StepIndicator({
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition-all ${
                     isActive
-                      ? "bg-[var(--color-accent)] text-white ring-4 ring-[var(--color-accent-subtle)]"
+                      ? "bg-[var(--color-accent)] text-white shadow-md ring-4 ring-[var(--color-accent-subtle)]"
                       : isCompleted
                         ? "bg-[var(--color-accent)] text-white"
-                        : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
+                        : "bg-[var(--color-surface)] text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
                   }`}
                 >
                   {isCompleted ? (
@@ -75,7 +75,7 @@ function StepIndicator({
                 </div>
                 <div className="mt-2 text-center">
                   <p
-                    className={`text-xs font-medium ${
+                    className={`text-xs font-semibold ${
                       isActive
                         ? "text-[var(--color-accent)]"
                         : isCompleted
@@ -92,7 +92,7 @@ function StepIndicator({
               </div>
               {!isLast && (
                 <div
-                  className={`mx-2 h-0.5 w-8 sm:w-16 ${
+                  className={`mx-2 h-0.5 w-8 sm:w-16 transition-colors ${
                     isCompleted ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"
                   }`}
                 />
