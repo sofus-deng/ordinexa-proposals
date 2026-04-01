@@ -36,6 +36,121 @@ import type {
 import type { ProviderStatus } from "@/lib/ai-generation";
 
 /**
+ * Step indicator for the 3-step proposal creation flow
+ */
+function StepIndicator({
+  steps,
+  currentStep,
+}: {
+  steps: Array<{ number: number; label: string; description: string }>;
+  currentStep: number;
+}) {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-center gap-2 sm:gap-4">
+        {steps.map((step, index) => {
+          const isActive = step.number === currentStep;
+          const isCompleted = step.number < currentStep;
+          const isLast = index === steps.length - 1;
+
+          return (
+            <div key={step.number} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition-all ${
+                    isActive
+                      ? "bg-[var(--color-accent)] text-white ring-4 ring-[var(--color-accent-subtle)]"
+                      : isCompleted
+                        ? "bg-[var(--color-accent)] text-white"
+                        : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    step.number
+                  )}
+                </div>
+                <div className="mt-2 text-center">
+                  <p
+                    className={`text-xs font-medium ${
+                      isActive
+                        ? "text-[var(--color-accent)]"
+                        : isCompleted
+                          ? "text-[var(--color-text-primary)]"
+                          : "text-[var(--color-text-secondary)]"
+                    }`}
+                  >
+                    {step.label}
+                  </p>
+                  <p className="hidden text-[11px] text-[var(--color-text-secondary)] sm:block">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+              {!isLast && (
+                <div
+                  className={`mx-2 h-0.5 w-8 sm:w-16 ${
+                    isCompleted ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Success state component shown after proposal is saved
+ */
+function SaveSuccessState({
+  proposalId,
+  onNewProposal,
+}: {
+  proposalId: string | null;
+  onNewProposal: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+        <svg className="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h2 className="mt-6 text-xl font-semibold text-[var(--color-text-primary)]">
+        Proposal saved
+      </h2>
+      <p className="mt-2 max-w-md text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+        Your proposal has been saved and is ready to share with your client.
+      </p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        {proposalId && (
+          <>
+            <Button onClick={() => (window.location.href = `/proposals/${proposalId}`)}>
+              View proposal
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => (window.location.href = `/proposals/${proposalId}/export`)}
+            >
+              Export view
+            </Button>
+          </>
+        )}
+        <Button variant="secondary" onClick={onNewProposal}>
+          Create another
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Default form state for estimation inputs
  */
 const defaultFormData: EstimationInput = {
@@ -57,13 +172,13 @@ type ProviderOption = AIGenerationConfig["provider"];
 const providerOptions: Array<{ value: ProviderOption; label: string; description: string }> = [
   {
     value: "gemini",
-    label: "Gemini-first",
-    description: "Uses Gemini when available, with automatic mock fallback if unavailable.",
+    label: "Gemini AI",
+    description: "AI-powered proposal generation with smart fallback for demos.",
   },
   {
     value: "mock",
-    label: "Mock preview",
-    description: "Deterministic local proposal generation for demos and development.",
+    label: "Demo preview",
+    description: "Deterministic content for consistent demo presentations.",
   },
 ];
 
@@ -419,6 +534,12 @@ function formatPercentage(value: number): string {
   return `${sign}${(value * 100).toFixed(0)}%`;
 }
 
+const STEPS = [
+  { number: 1, label: "Estimate", description: "Calculate budget & timeline" },
+  { number: 2, label: "Preview", description: "Generate proposal content" },
+  { number: 3, label: "Save", description: "Save and share" },
+];
+
 export default function NewProposalPage() {
   const [formData, setFormData] = useState<EstimationInput>(defaultFormData);
   const [estimate, setEstimate] = useState<EstimateSummary | null>(null);
@@ -429,12 +550,20 @@ export default function NewProposalPage() {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [savedProposalId, setSavedProposalId] = useState<string | null>(null);
   const [providerStatus, setProviderStatus] = useState<ProviderStatus | null>(null);
   const [actualProviderUsed, setActualProviderUsed] = useState<"gemini" | "mock" | null>(null);
 
   const repository = useMemo(() => createMockPricingRepository(), []);
   const proposalRepository = useMemo(() => createMockProposalRepository(), []);
+
+  // Calculate current step based on state
+  const currentStep = useMemo(() => {
+    if (savedProposalId) return 3;
+    if (generatedProposal) return 3;
+    if (estimate) return 2;
+    return 1;
+  }, [estimate, generatedProposal, savedProposalId]);
 
   // Check provider status on mount
   useEffect(() => {
@@ -470,6 +599,7 @@ export default function NewProposalPage() {
       const result = await calculateEstimate(repository, formData);
       setEstimate(result);
       setGeneratedProposal(null);
+      setSavedProposalId(null);
     } catch (error) {
       console.error("Estimation failed:", error);
       setValidationErrors(["Failed to calculate estimate. Please try again."]);
@@ -507,6 +637,7 @@ export default function NewProposalPage() {
 
       setGeneratedProposal(result.content);
       setActualProviderUsed(result.providerUsed);
+      setSavedProposalId(null);
     } catch (error) {
       console.error("Proposal generation failed:", error);
       setGenerationError("Failed to generate proposal content. Please retry.");
@@ -530,12 +661,11 @@ export default function NewProposalPage() {
 
     setIsSaving(true);
     setValidationErrors([]);
-    setSaveSuccess(null);
 
     try {
       const input = buildProposalGenerationInput(formData, estimate);
 
-      await proposalRepository.create({
+      const savedProposal = await proposalRepository.create({
         title: input.projectContext.title,
         clientName: input.projectContext.clientName,
         contactName: input.projectContext.contactName,
@@ -551,8 +681,7 @@ export default function NewProposalPage() {
         } : undefined,
       });
 
-      setSaveSuccess("Proposal saved successfully!");
-      setTimeout(() => setSaveSuccess(null), 3000);
+      setSavedProposalId(savedProposal.id);
     } catch (error) {
       console.error("Save failed:", error);
       setGenerationError("Failed to save proposal. Please try again.");
@@ -561,16 +690,49 @@ export default function NewProposalPage() {
     }
   }, [formData, estimate, generatedProposal, proposalRepository]);
 
+  const handleReset = useCallback(() => {
+    setFormData(defaultFormData);
+    setEstimate(null);
+    setGeneratedProposal(null);
+    setGenerationError(null);
+    setValidationErrors([]);
+    setSelectedProvider("gemini");
+    setSavedProposalId(null);
+    setActualProviderUsed(null);
+  }, []);
+
+  // Show success state after save
+  if (savedProposalId) {
+    return (
+      <AppShell>
+        <div className="space-y-8">
+          <PageHeader
+            title="Proposal created"
+            description="Your proposal has been saved and is ready to share."
+          />
+          <Card>
+            <SaveSuccessState
+              proposalId={savedProposalId}
+              onNewProposal={handleReset}
+            />
+          </Card>
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <div className="space-y-8">
         <PageHeader
-          title="New proposal"
-          description="Configure the interior fit-out parameters, generate a deterministic estimate, and preview structured AI proposal content in one polished flow."
+          title="Create proposal"
+          description="Configure your project requirements, generate a budget estimate, and create a polished proposal ready for client presentation."
         />
 
+        <StepIndicator steps={STEPS} currentStep={currentStep} />
+
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_400px]">
-          <Card title="Estimation inputs" eyebrow="Interior fit-out">
+          <Card title="Project details" eyebrow="Step 1">
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleCalculateEstimate(); }}>
               <SectionBlock title="Project parameters" description="Core inputs that define the baseline budget and timeline.">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -619,7 +781,7 @@ export default function NewProposalPage() {
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="Scope options" description="Additional features and scope items that adjust the baseline estimate.">
+              <SectionBlock title="Additional scope" description="Optional features that enhance the project scope.">
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     { key: "includeReceptionArea" as const, label: "Reception area", desc: "Front-of-house welcome zone" },
@@ -661,7 +823,7 @@ export default function NewProposalPage() {
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="Timeline constraints" description="Project delivery requirements that may impact pricing.">
+              <SectionBlock title="Timeline" description="Project delivery requirements.">
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
@@ -694,8 +856,8 @@ export default function NewProposalPage() {
               </SectionBlock>
 
               <SectionBlock
-                title="Proposal generation"
-                description="Choose the generation path for the proposal preview. Gemini is preferred, with mock fallback kept available for reliable demos."
+                title="Content generation"
+                description="Choose how proposal content is generated."
               >
                 <div className="space-y-3">
                   {providerOptions.map((option) => {
@@ -726,7 +888,7 @@ export default function NewProposalPage() {
                                 : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
                             }`}
                           >
-                            {toTitleCase(option.value)}
+                            {option.value === "gemini" ? "AI" : "Demo"}
                           </span>
                         </div>
                       </button>
@@ -763,7 +925,7 @@ export default function NewProposalPage() {
                             ? "text-emerald-800"
                             : "text-amber-800"
                         }`}>
-                          {providerStatus.isAvailable ? "Gemini AI available" : "Demo mode active"}
+                          {providerStatus.isAvailable ? "AI generation ready" : "Demo mode active"}
                         </p>
                         <p className={`mt-1 text-[var(--text-xs)] leading-5 ${
                           providerStatus.isAvailable
@@ -791,56 +953,75 @@ export default function NewProposalPage() {
 
               {generationError && (
                 <div className="rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-[var(--text-sm)] font-medium text-amber-800">Proposal generation issue</p>
+                  <p className="text-[var(--text-sm)] font-medium text-amber-800">Unable to complete action</p>
                   <p className="mt-1 text-[var(--text-sm)] text-amber-700">{generationError}</p>
                 </div>
               )}
 
-              {saveSuccess && (
-                <div className="rounded-[var(--radius-lg)] border border-green-200 bg-green-50 p-4">
-                  <p className="text-[var(--text-sm)] font-medium text-green-800">{saveSuccess}</p>
+              {/* Action buttons with clear hierarchy */}
+              <div className="space-y-4">
+                {/* Primary action area */}
+                <div className="flex flex-wrap gap-3">
+                  {!estimate ? (
+                    <Button type="submit" disabled={isCalculating}>
+                      {isCalculating ? "Calculating..." : "Generate estimate"}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        type="button"
+                        onClick={handleGenerateProposal}
+                        disabled={isGeneratingProposal}
+                      >
+                        {isGeneratingProposal ? "Generating..." : "Generate proposal preview"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleCalculateEstimate}
+                        disabled={isCalculating}
+                      >
+                        {isCalculating ? "Recalculating..." : "Recalculate estimate"}
+                      </Button>
+                    </>
+                  )}
                 </div>
-              )}
 
-              <div className="flex flex-wrap gap-3">
-                <Button type="submit" disabled={isCalculating}>
-                  {isCalculating ? "Calculating..." : "Generate estimate"}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleGenerateProposal}
-                  disabled={isGeneratingProposal}
-                >
-                  {isGeneratingProposal ? "Generating proposal..." : "Generate proposal preview"}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleSaveProposal}
-                  disabled={isSaving || !estimate}
-                >
-                  {isSaving ? "Saving..." : "Save proposal"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setFormData(defaultFormData);
-                    setEstimate(null);
-                    setGeneratedProposal(null);
-                    setGenerationError(null);
-                    setValidationErrors([]);
-                    setSelectedProvider("gemini");
-                    setSaveSuccess(null);
-                  }}
-                >
-                  Reset form
-                </Button>
+                {/* Secondary action area - gated by proposal preview */}
+                {estimate && (
+                  <div className="flex flex-wrap gap-3 border-t border-[var(--color-border)] pt-4">
+                    <Button
+                      type="button"
+                      onClick={handleSaveProposal}
+                      disabled={isSaving || !generatedProposal}
+                      variant={generatedProposal ? "primary" : "secondary"}
+                    >
+                      {isSaving ? "Saving..." : "Save proposal"}
+                    </Button>
+                    {!generatedProposal && (
+                      <p className="flex items-center text-[var(--text-xs)] text-[var(--color-text-secondary)]">
+                        Generate a proposal preview first to enable saving.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Reset action */}
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleReset}
+                  >
+                    Start over
+                  </Button>
+                </div>
               </div>
             </form>
           </Card>
 
           <div className="space-y-6">
-            <Card title="Estimate result" eyebrow="Calculated">
+            <Card title="Budget estimate" eyebrow={estimate ? "Calculated" : "Pending"}>
               {estimate ? (
                 <div className="space-y-6">
                   {/* Primary metrics */}
@@ -994,37 +1175,37 @@ export default function NewProposalPage() {
               ) : (
               <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
                 <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
-                  <p className="text-[var(--color-text-primary)]">No estimate generated yet</p>
-                    <p className="mt-1">Configure the project parameters and click Generate estimate to see results.</p>
+                  <p className="text-[var(--color-text-primary)]">Configure your project to generate an estimate</p>
+                    <p className="mt-1">Select project type, style, area, and any additional scope options to calculate budget and timeline.</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-[var(--color-text-primary)]">How it works</p>
+                    <p className="font-semibold text-[var(--color-text-primary)]">Quick guide</p>
                     <ul className="space-y-2 leading-6">
-                      <li>Select project type and style to set the baseline.</li>
-                      <li>Enter area and meeting room count for scope sizing.</li>
-                      <li>Toggle scope options to adjust the estimate.</li>
-                      <li>Mark as rush for compressed timeline pricing.</li>
+                      <li>Choose project type and interior style.</li>
+                      <li>Enter the total area in ping.</li>
+                      <li>Add optional scope items as needed.</li>
+                      <li>Click Generate estimate to see results.</li>
                     </ul>
                   </div>
                 </div>
               )}
             </Card>
 
-            <Card title="Proposal preview" eyebrow="Generated content">
+            <Card title="Proposal preview" eyebrow={generatedProposal ? "Ready" : "Pending"}>
               {generatedProposal ? (
                 <div className="space-y-5">
                   <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex-1">
                         <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">
-                          Structured proposal ready for review
+                          Proposal ready for review
                         </p>
                         <p className="mt-1 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
-                          Provider: {toTitleCase(generatedProposal.metadata.provider)} · Model: {generatedProposal.metadata.modelUsed}
+                          Source: {toTitleCase(generatedProposal.metadata.provider)} · {generatedProposal.metadata.modelUsed}
                         </p>
                         {actualProviderUsed === "mock" && (
                           <p className="mt-2 text-[var(--text-xs)] text-amber-700">
-                            <span className="font-semibold">Demo mode:</span> This proposal was generated using the mock provider for demonstration purposes.
+                            <span className="font-semibold">Demo mode:</span> This proposal was generated using demo content for presentation purposes.
                           </p>
                         )}
                       </div>
@@ -1044,25 +1225,25 @@ export default function NewProposalPage() {
               ) : (
                 <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
                   <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
-                    <p className="text-[var(--color-text-primary)]">No proposal preview generated yet</p>
+                    <p className="text-[var(--color-text-primary)]">Generate a proposal preview</p>
                     <p className="mt-1">
-                      Use the current form inputs and estimate context to generate structured proposal sections directly on this page.
+                      After generating an estimate, click Generate proposal preview to create structured content for your client presentation.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-[var(--color-text-primary)]">Preview includes</p>
+                    <p className="font-semibold text-[var(--color-text-primary)]">Includes</p>
                     <ul className="space-y-2 leading-6">
                       <li>Executive summary and project understanding</li>
-                      <li>Design direction and spatial planning recommendations</li>
-                      <li>Budget and timeline narratives grounded in current estimate results</li>
-                      <li>Risks, assumptions, and recommended next steps</li>
+                      <li>Design direction and spatial planning</li>
+                      <li>Budget and timeline narratives</li>
+                      <li>Risks, assumptions, and next steps</li>
                     </ul>
                   </div>
                 </div>
               )}
             </Card>
 
-            <Card title="Pricing baseline" eyebrow="Active rule set">
+            <Card title="Pricing reference" eyebrow="Active">
               <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
                 <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
                   <p className="text-[var(--text-base)] font-semibold text-[var(--color-text-primary)]">
@@ -1071,12 +1252,12 @@ export default function NewProposalPage() {
                   <p className="mt-1 leading-6">{activePricingRuleSet.notes}</p>
                 </div>
                 <div className="space-y-2">
-                  <p className="font-semibold text-[var(--color-text-primary)]">Estimation engine</p>
+                  <p className="font-semibold text-[var(--color-text-primary)]">How estimates work</p>
                   <ul className="space-y-2 leading-6">
+                    <li>Budget and timeline are calculated from base rates.</li>
+                    <li>Style selection adjusts finish level pricing.</li>
+                    <li>Scope options add percentage adjustments.</li>
                     <li>All calculations are deterministic and repeatable.</li>
-                    <li>Budget and timeline derive from the active pricing rule set.</li>
-                    <li>Style multipliers adjust finish level pricing.</li>
-                    <li>Scope options add percentage or flat adjustments.</li>
                   </ul>
                 </div>
               </div>

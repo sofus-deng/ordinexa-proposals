@@ -8,8 +8,8 @@ test("redirects root to dashboard", async ({ page }) => {
 
 test("renders new proposal form", async ({ page }) => {
   await page.goto("/proposals/new");
-  await expect(page.getByRole("heading", { name: "New proposal" })).toBeVisible();
-  await expect(page.getByText("Estimation inputs")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Create proposal" })).toBeVisible();
+  await expect(page.getByText("Project details")).toBeVisible();
   await expect(page.getByRole("button", { name: "Generate estimate" })).toBeVisible();
 });
 
@@ -32,8 +32,8 @@ test("estimation flow: generates estimate with default inputs", async ({ page })
   await page.goto("/proposals/new");
 
   // Verify the form loads with expected elements
-  await expect(page.getByRole("heading", { name: "New proposal" })).toBeVisible();
-  await expect(page.getByText("Estimation inputs")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Create proposal" })).toBeVisible();
+  await expect(page.getByText("Project details")).toBeVisible();
 
   // Trigger estimate generation
   await page.getByRole("button", { name: "Generate estimate" }).click();
@@ -128,10 +128,10 @@ test("estimation flow: reset form clears estimate", async ({ page }) => {
   await expect(page.getByText("Estimated budget")).toBeVisible();
 
   // Reset the form
-  await page.getByRole("button", { name: "Reset form" }).click();
+  await page.getByRole("button", { name: "Start over" }).click();
 
   // Verify estimate is cleared
-  await expect(page.getByText("No estimate generated yet")).toBeVisible();
+  await expect(page.getByText("Configure your project to generate an estimate")).toBeVisible();
 });
 
 
@@ -245,7 +245,11 @@ test("AI generation flow: generates proposal preview with default provider", asy
   await page.goto("/proposals/new");
 
   // Verify the form loads
-  await expect(page.getByRole("heading", { name: "New proposal" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Create proposal" })).toBeVisible();
+
+  // First generate an estimate (required before proposal preview is available)
+  await page.getByRole("button", { name: "Generate estimate" }).click();
+  await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Trigger AI proposal generation with default provider (Gemini-first with mock fallback)
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
@@ -261,10 +265,14 @@ test("AI generation flow: generates proposal preview with mock provider", async 
   await page.goto("/proposals/new");
 
   // Verify the form loads
-  await expect(page.getByRole("heading", { name: "New proposal" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Create proposal" })).toBeVisible();
 
   // Select mock provider for deterministic results
-  await page.getByRole("button", { name: /Mock preview/ }).click();
+  await page.getByRole("button", { name: /Demo preview/ }).click();
+
+  // First generate an estimate (required before proposal preview is available)
+  await page.getByRole("button", { name: "Generate estimate" }).click();
+  await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Trigger AI proposal generation
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
@@ -286,7 +294,11 @@ test("AI generation flow: executive summary contains key sections", async ({ pag
   await page.goto("/proposals/new");
 
   // Select mock provider for deterministic results
-  await page.getByRole("button", { name: /Mock preview/ }).click();
+  await page.getByRole("button", { name: /Demo preview/ }).click();
+
+  // First generate an estimate (required before proposal preview is available)
+  await page.getByRole("button", { name: "Generate estimate" }).click();
+  await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Trigger AI proposal generation
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
@@ -303,7 +315,11 @@ test("AI generation flow: design direction includes materials and finishes", asy
   await page.goto("/proposals/new");
 
   // Select mock provider for deterministic results
-  await page.getByRole("button", { name: /Mock preview/ }).click();
+  await page.getByRole("button", { name: /Demo preview/ }).click();
+
+  // First generate an estimate (required before proposal preview is available)
+  await page.getByRole("button", { name: "Generate estimate" }).click();
+  await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Trigger AI proposal generation
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
@@ -324,7 +340,7 @@ test("AI generation flow: estimate remains visible after proposal generation", a
   await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Then generate proposal preview
-  await page.getByRole("button", { name: /Mock preview/ }).click();
+  await page.getByRole("button", { name: /Demo preview/ }).click();
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
 
   // Wait for AI content
