@@ -1,10 +1,21 @@
 import Link from "next/link";
 
-import type { Proposal } from "@/types";
+import type { ProposalRecord } from "@/types/proposal-record";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/ui";
 
-export function ProposalListCard({ proposal }: { proposal: Proposal }) {
+interface ProposalListCardProps {
+  proposal: ProposalRecord;
+}
+
+export function ProposalListCard({ proposal }: ProposalListCardProps) {
+  const hasAiContent = !!proposal.generatedContent;
+  const currency = proposal.estimationResult.currency ?? "TWD";
+  const budgetRange = proposal.estimationResult.budget.final;
+  const estimatedTotal = (budgetRange.min + budgetRange.max) / 2;
+  const timelineWeeks = proposal.estimationResult.timeline.final;
+  const avgWeeks = (timelineWeeks.minWeeks + timelineWeeks.maxWeeks) / 2;
+
   return (
     <Link
       href={`/proposals/${proposal.id}`}
@@ -14,6 +25,11 @@ export function ProposalListCard({ proposal }: { proposal: Proposal }) {
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-[var(--text-lg)] font-semibold text-[var(--color-text-primary)]">{proposal.title}</h3>
           <StatusBadge status={proposal.status} />
+          {hasAiContent && (
+            <span className="inline-flex items-center rounded-full bg-[var(--color-primary-soft)] px-2 py-0.5 text-xs font-medium text-[var(--color-primary-emphasis)]">
+              AI Generated
+            </span>
+          )}
         </div>
         <p className="text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">{proposal.summary}</p>
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-[var(--text-xs)] font-medium text-[var(--color-text-muted)]">
@@ -26,10 +42,10 @@ export function ProposalListCard({ proposal }: { proposal: Proposal }) {
       <div className="space-y-2 text-[var(--text-sm)]">
         <p className="text-[var(--color-text-muted)]">Estimate</p>
         <p className="text-[var(--text-xl)] font-semibold text-[var(--color-text-primary)]">
-          {formatCurrency(proposal.estimate.estimatedTotal)}
+          {formatCurrency(estimatedTotal, currency)}
         </p>
         <p className="text-[var(--text-xs)] text-[var(--color-text-secondary)]">
-          Confidence {proposal.estimate.confidenceLabel}
+          {avgWeeks.toFixed(0)} weeks
         </p>
       </div>
 

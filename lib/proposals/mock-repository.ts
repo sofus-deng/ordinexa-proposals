@@ -9,9 +9,13 @@
  * - Generates deterministic IDs
  * - Provides seed data from existing mock proposals
  * - Maintains backward compatibility with existing mock data
+ * - Supports list queries with sorting and filtering for dashboard use
  */
 
-import type { ProposalRepository } from "./repository";
+import type {
+  ProposalRepository,
+  ProposalListOptions,
+} from "./repository";
 import type {
   ProposalRecord,
   CreateProposalInput,
@@ -150,6 +154,49 @@ function seedMockData(): void {
 }
 
 /**
+ * Sorts proposals based on the provided sort options.
+ */
+function sortProposals(
+  proposals: ProposalRecord[],
+  sort: NonNullable<ProposalListOptions["sort"]>
+): ProposalRecord[] {
+  return [...proposals].sort((a, b) => {
+    const aVal = a[sort.field];
+    const bVal = b[sort.field];
+    
+    if (aVal === bVal) return 0;
+    
+    const comparison = aVal < bVal ? -1 : 1;
+    return sort.direction === "asc" ? comparison : -comparison;
+  });
+}
+
+/**
+ * Filters proposals based on the provided filter options.
+ */
+function filterProposals(
+  proposals: ProposalRecord[],
+  filter: NonNullable<ProposalListOptions["filter"]>
+): ProposalRecord[] {
+  return proposals.filter((proposal) => {
+    if (filter.status && filter.status.length > 0) {
+      if (!filter.status.includes(proposal.status)) {
+        return false;
+      }
+    }
+    
+    if (filter.clientName) {
+      const searchLower = filter.clientName.toLowerCase();
+      if (!proposal.clientName.toLowerCase().includes(searchLower)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+}
+
+/**
  * Creates a mock proposal repository.
  * This can later be replaced with a Prisma-backed implementation.
  */
@@ -164,6 +211,30 @@ export function createMockProposalRepository(): ProposalRepository {
 
     async getAll(): Promise<ProposalRecord[]> {
       return [...proposalsStore];
+    },
+
+    async list(options?: ProposalListOptions): Promise<ProposalRecord[]> {
+      let results = [...proposalsStore];
+      
+      // Apply filters
+      if (options?.filter) {
+        results = filterProposals(results, options.filter);
+      }
+      
+      // Apply sorting
+      const sortOptions = options?.sort ?? { field: "updatedAt", direction: "desc" };
+      results = sortProposals(results, sortOptions);
+      
+      // Apply pagination
+      if (options?.offset !== undefined) {
+        results = results.slice(options.offset);
+      }
+      
+      if (options?.limit !== undefined) {
+        results = results.slice(0, options.limit);
+      }
+      
+      return results;
     },
 
     async create(input: CreateProposalInput): Promise<ProposalRecord> {

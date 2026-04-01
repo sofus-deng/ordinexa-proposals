@@ -1,11 +1,38 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { ProposalListCard, StatChip } from "@/components/domain";
 import { ButtonLink, Card, PageHeader } from "@/components/ui";
-import { proposals } from "@/data";
+import { createMockProposalRepository } from "@/lib/proposals";
 
-const totalPipeline = proposals.reduce((total, proposal) => total + proposal.estimate.estimatedTotal, 0);
+// Initialize repository instance
+const proposalRepository = createMockProposalRepository();
 
-export default function DashboardPage() {
+async function getDashboardData() {
+  // Fetch proposals from repository (sorted by updatedAt descending)
+  const proposals = await proposalRepository.list({
+    sort: { field: "updatedAt", direction: "desc" },
+  });
+
+  // Calculate pipeline metrics
+  const totalPipeline = proposals.reduce((total, proposal) => {
+    const budgetRange = proposal.estimationResult.budget.final;
+    const estimatedTotal = (budgetRange.min + budgetRange.max) / 2;
+    return total + estimatedTotal;
+  }, 0);
+
+  const inReviewCount = proposals.filter((proposal) => proposal.status === "review").length;
+  const sentCount = proposals.filter((proposal) => proposal.status === "sent").length;
+
+  return {
+    proposals,
+    totalPipeline,
+    inReviewCount,
+    sentCount,
+  };
+}
+
+export default async function DashboardPage() {
+  const { proposals, totalPipeline, inReviewCount, sentCount } = await getDashboardData();
+
   return (
     <AppShell>
       <div className="space-y-8">
@@ -17,17 +44,23 @@ export default function DashboardPage() {
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <StatChip label="Open proposals" value={`${proposals.length}`} tone="primary" />
-          <StatChip label="In review" value={`${proposals.filter((proposal) => proposal.status === "review").length}`} />
-          <StatChip label="Sent this cycle" value={`${proposals.filter((proposal) => proposal.status === "sent").length}`} tone="secondary" />
+          <StatChip label="In review" value={`${inReviewCount}`} />
+          <StatChip label="Sent this cycle" value={`${sentCount}`} tone="secondary" />
           <StatChip label="Pipeline value" value={`$${Math.round(totalPipeline / 1000)}k`} />
         </section>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_380px]">
           <Card title="Active proposals" eyebrow="Proposal pipeline">
             <div className="space-y-4">
-              {proposals.map((proposal) => (
-                <ProposalListCard key={proposal.id} proposal={proposal} />
-              ))}
+              {proposals.length === 0 ? (
+                <p className="text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                  No proposals yet. Create your first proposal to get started.
+                </p>
+              ) : (
+                proposals.map((proposal) => (
+                  <ProposalListCard key={proposal.id} proposal={proposal} />
+                ))
+              )}
             </div>
           </Card>
 

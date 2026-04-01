@@ -1,10 +1,11 @@
 /**
- * Unit Tests for Proposal Repository (ORDX-022E)
+ * Unit Tests for Proposal Repository (ORDX-022E, ORDX-023D)
  *
  * Tests cover:
  * - Creating proposals with estimation snapshot and AI content
  * - Reading proposals by ID
  * - Listing all proposals
+ * - Listing proposals with sorting and filtering (dashboard queries)
  * - Updating proposals
  * - Deleting proposals
  * - Mock data seeding
@@ -296,6 +297,249 @@ describe("Proposal Repository", () => {
       const second = await repository.getAll();
 
       assert.notStrictEqual(first, second, "Should return different array instances");
+    });
+  });
+
+  describe("list", () => {
+    it("should return proposals sorted by updatedAt descending by default", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Client 1" });
+      const input2 = createTestProposalInput({ clientName: "Client 2" });
+
+      await repository.create(input1);
+      await repository.create(input2);
+
+      const result = await repository.list();
+
+      assert.ok(result.length > 0, "Should have proposals");
+      
+      // Verify sorted by updatedAt descending
+      for (let i = 1; i < result.length; i++) {
+        assert.ok(
+          result[i - 1].updatedAt >= result[i].updatedAt,
+          `Proposal at index ${i - 1} should have updatedAt >= proposal at index ${i}`
+        );
+      }
+    });
+
+    it("should sort by createdAt ascending", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Client 1" });
+      const input2 = createTestProposalInput({ clientName: "Client 2" });
+
+      await repository.create(input1);
+      await repository.create(input2);
+
+      const result = await repository.list({
+        sort: { field: "createdAt", direction: "asc" },
+      });
+
+      assert.ok(result.length > 0, "Should have proposals");
+      
+      // Verify sorted by createdAt ascending
+      for (let i = 1; i < result.length; i++) {
+        assert.ok(
+          result[i - 1].createdAt <= result[i].createdAt,
+          `Proposal at index ${i - 1} should have createdAt <= proposal at index ${i}`
+        );
+      }
+    });
+
+    it("should sort by title alphabetically", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ title: "Zebra Proposal", clientName: "Client 1" });
+      const input2 = createTestProposalInput({ title: "Alpha Proposal", clientName: "Client 2" });
+
+      await repository.create(input1);
+      await repository.create(input2);
+
+      const result = await repository.list({
+        sort: { field: "title", direction: "asc" },
+      });
+
+      assert.ok(result.length > 0, "Should have proposals");
+      
+      // Find our created proposals
+      const alphaProposal = result.find((p) => p.title === "Alpha Proposal");
+      const zebraProposal = result.find((p) => p.title === "Zebra Proposal");
+      
+      assert.ok(alphaProposal, "Should find Alpha Proposal");
+      assert.ok(zebraProposal, "Should find Zebra Proposal");
+      
+      // Alpha should come before Zebra
+      const alphaIndex = result.indexOf(alphaProposal);
+      const zebraIndex = result.indexOf(zebraProposal);
+      assert.ok(
+        alphaIndex < zebraIndex,
+        "Alpha Proposal should come before Zebra Proposal"
+      );
+    });
+
+    it("should filter by status", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Client 1" });
+      const input2 = createTestProposalInput({ clientName: "Client 2" });
+
+      const created1 = await repository.create(input1);
+      const created2 = await repository.create(input2);
+
+      // Update one to review status
+      await repository.update(created1.id, { status: "review" });
+
+      const result = await repository.list({
+        filter: { status: ["review"] },
+      });
+
+      assert.ok(result.length > 0, "Should have filtered proposals");
+      assert.ok(
+        result.every((p) => p.status === "review"),
+        "All proposals should have review status"
+      );
+      assert.ok(
+        result.some((p) => p.id === created1.id),
+        "Should include the review proposal"
+      );
+      assert.ok(
+        !result.some((p) => p.id === created2.id),
+        "Should not include the draft proposal"
+      );
+    });
+
+    it("should filter by multiple statuses", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Client 1" });
+      const input2 = createTestProposalInput({ clientName: "Client 2" });
+      const input3 = createTestProposalInput({ clientName: "Client 3" });
+
+      const created1 = await repository.create(input1);
+      const created2 = await repository.create(input2);
+      await repository.create(input3);
+
+      // Update statuses
+      await repository.update(created1.id, { status: "review" });
+      await repository.update(created2.id, { status: "sent" });
+
+      const result = await repository.list({
+        filter: { status: ["review", "sent"] },
+      });
+
+      assert.ok(result.length >= 2, "Should have at least 2 filtered proposals");
+      assert.ok(
+        result.every((p) => p.status === "review" || p.status === "sent"),
+        "All proposals should have review or sent status"
+      );
+    });
+
+    it("should filter by client name (case insensitive)", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Acme Corporation" });
+      const input2 = createTestProposalInput({ clientName: "Beta Industries" });
+
+      const created1 = await repository.create(input1);
+      await repository.create(input2);
+
+      const result = await repository.list({
+        filter: { clientName: "acme" },
+      });
+
+      assert.ok(result.length > 0, "Should have filtered proposals");
+      assert.ok(
+        result.some((p) => p.id === created1.id),
+        "Should include Acme Corporation"
+      );
+      assert.ok(
+        result.every((p) => p.clientName.toLowerCase().includes("acme")),
+        "All proposals should include 'acme' in client name"
+      );
+    });
+
+    it("should apply both filter and sort", async () => {
+      const repository = createMockProposalRepository();
+      const input1 = createTestProposalInput({ clientName: "Acme Corp", title: "Zebra" });
+      const input2 = createTestProposalInput({ clientName: "Acme Inc", title: "Alpha" });
+
+      const created1 = await repository.create(input1);
+      const created2 = await repository.create(input2);
+
+      await repository.update(created1.id, { status: "review" });
+      await repository.update(created2.id, { status: "review" });
+
+      const result = await repository.list({
+        filter: { status: ["review"] },
+        sort: { field: "title", direction: "asc" },
+      });
+
+      assert.ok(result.length >= 2, "Should have filtered proposals");
+      assert.ok(
+        result.every((p) => p.status === "review"),
+        "All proposals should have review status"
+      );
+      
+      // Verify sorted by title
+      for (let i = 1; i < result.length; i++) {
+        assert.ok(
+          result[i - 1].title <= result[i].title,
+          `Proposal at index ${i - 1} should have title <= proposal at index ${i}`
+        );
+      }
+    });
+
+    it("should apply limit", async () => {
+      const repository = createMockProposalRepository();
+
+      const result = await repository.list({
+        limit: 2,
+      });
+
+      assert.strictEqual(result.length, 2, "Should return exactly 2 proposals");
+    });
+
+    it("should apply offset", async () => {
+      const repository = createMockProposalRepository();
+
+      const firstPage = await repository.list({
+        limit: 2,
+        offset: 0,
+      });
+
+      const secondPage = await repository.list({
+        limit: 2,
+        offset: 2,
+      });
+
+      assert.ok(firstPage.length > 0, "First page should have proposals");
+      assert.ok(secondPage.length > 0, "Second page should have proposals");
+      
+      // Verify different proposals
+      const firstIds = new Set(firstPage.map((p) => p.id));
+      const secondIds = new Set(secondPage.map((p) => p.id));
+      
+      const intersection = [...firstIds].filter((id) => secondIds.has(id));
+      assert.strictEqual(intersection.length, 0, "Pages should not overlap");
+    });
+
+    it("should return all proposals when no options provided", async () => {
+      const repository = createMockProposalRepository();
+
+      const result = await repository.list();
+      const all = await repository.getAll();
+
+      assert.strictEqual(result.length, all.length, "Should return all proposals");
+    });
+
+    it("should return seeded proposals in list", async () => {
+      const repository = createMockProposalRepository();
+
+      const result = await repository.list();
+
+      assert.ok(
+        result.some((p) => p.id === "ordx-1001"),
+        "Should include seeded mock proposal ordx-1001"
+      );
+      assert.ok(
+        result.some((p) => p.id === "ordx-1002"),
+        "Should include seeded mock proposal ordx-1002"
+      );
     });
   });
 

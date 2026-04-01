@@ -11,6 +11,41 @@ import type {
   CreateProposalInput,
   UpdateProposalInput,
 } from "@/types/proposal-record";
+import type { ProposalStatus } from "@/types/proposal";
+
+/**
+ * Sorting options for proposal list queries.
+ */
+export interface ProposalListSortOptions {
+  /** Field to sort by */
+  field: "createdAt" | "updatedAt" | "dueDate" | "title";
+  /** Sort direction */
+  direction: "asc" | "desc";
+}
+
+/**
+ * Filter options for proposal list queries.
+ */
+export interface ProposalListFilterOptions {
+  /** Filter by status */
+  status?: ProposalStatus[];
+  /** Filter by client name (partial match) */
+  clientName?: string;
+}
+
+/**
+ * Query options for listing proposals.
+ */
+export interface ProposalListOptions {
+  /** Sorting options */
+  sort?: ProposalListSortOptions;
+  /** Filter options */
+  filter?: ProposalListFilterOptions;
+  /** Maximum number of results */
+  limit?: number;
+  /** Offset for pagination */
+  offset?: number;
+}
 
 /**
  * Repository interface for proposal persistence.
@@ -28,6 +63,13 @@ export interface ProposalRepository {
    * Returns an empty array if no proposals exist.
    */
   getAll(): Promise<ProposalRecord[]>;
+
+  /**
+   * List proposals with optional sorting and filtering.
+   * This is the primary method for dashboard queries.
+   * Returns proposals sorted by updatedAt descending by default.
+   */
+  list(options?: ProposalListOptions): Promise<ProposalRecord[]>;
 
   /**
    * Create a new proposal record.
