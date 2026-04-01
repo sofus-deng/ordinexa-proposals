@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("redirects root to dashboard", async ({ page }) => {
+test("renders demo entry page at root", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ordinexa Proposals" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open workspace demo" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View sample proposal" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open export view" })).toBeVisible();
 });
 
 test("renders new proposal form", async ({ page }) => {
