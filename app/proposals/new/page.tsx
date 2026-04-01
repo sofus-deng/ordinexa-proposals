@@ -24,6 +24,7 @@ import {
   validateEstimationInput,
 } from "@/lib/estimation";
 import type { EstimationInput, EstimateSummary } from "@/lib/estimation";
+import { createMockProposalRepository } from "@/lib/proposals";
 import type {
   AIGenerationConfig,
   GeneratedProposalContent,
@@ -422,8 +423,11 @@ export default function NewProposalPage() {
   const [generatedProposal, setGeneratedProposal] = useState<GeneratedProposalContent | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const repository = useMemo(() => createMockPricingRepository(), []);
+  const proposalRepository = useMemo(() => createMockProposalRepository(), []);
 
   const updateField = useCallback(<K extends keyof EstimationInput>(
     field: K,
@@ -497,6 +501,52 @@ export default function NewProposalPage() {
       setIsGeneratingProposal(false);
     }
   }, [estimate, formData, repository, selectedProvider]);
+
+  const handleSaveProposal = useCallback(async () => {
+    const errors = validateEstimationInput(formData);
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    if (!estimate) {
+      setGenerationError("Please generate an estimate before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    setValidationErrors([]);
+    setSaveSuccess(null);
+
+    try {
+      const input = buildProposalGenerationInput(formData, estimate);
+
+      await proposalRepository.create({
+        title: input.projectContext.title,
+        clientName: input.projectContext.clientName,
+        contactName: input.projectContext.contactName,
+        industry: input.projectContext.industry,
+        scope: input.projectContext.scope,
+        estimationInput: formData,
+        estimationResult: estimate,
+        generatedContent: generatedProposal ?? undefined,
+        generationMetadata: generatedProposal ? {
+          provider: generatedProposal.metadata.provider,
+          model: generatedProposal.metadata.modelUsed,
+          generatedAt: generatedProposal.metadata.generatedAt,
+        } : undefined,
+      });
+
+      setSaveSuccess("Proposal saved successfully!");
+      setTimeout(() => setSaveSuccess(null), 3000);
+    } catch (error) {
+      console.error("Save failed:", error);
+      setGenerationError("Failed to save proposal. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [formData, estimate, generatedProposal, proposalRepository]);
 
   return (
     <AppShell>
@@ -690,6 +740,12 @@ export default function NewProposalPage() {
                 </div>
               )}
 
+              {saveSuccess && (
+                <div className="rounded-[var(--radius-lg)] border border-green-200 bg-green-50 p-4">
+                  <p className="text-[var(--text-sm)] font-medium text-green-800">{saveSuccess}</p>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-3">
                 <Button type="submit" disabled={isCalculating}>
                   {isCalculating ? "Calculating..." : "Generate estimate"}
@@ -703,6 +759,13 @@ export default function NewProposalPage() {
                 </Button>
                 <Button
                   type="button"
+                  onClick={handleSaveProposal}
+                  disabled={isSaving || !estimate}
+                >
+                  {isSaving ? "Saving..." : "Save proposal"}
+                </Button>
+                <Button
+                  type="button"
                   variant="secondary"
                   onClick={() => {
                     setFormData(defaultFormData);
@@ -711,6 +774,7 @@ export default function NewProposalPage() {
                     setGenerationError(null);
                     setValidationErrors([]);
                     setSelectedProvider("gemini");
+                    setSaveSuccess(null);
                   }}
                 >
                   Reset form

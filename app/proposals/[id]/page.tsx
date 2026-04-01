@@ -15,6 +15,7 @@ import {
   createDefaultProvider,
   generateProposal,
 } from "@/lib/ai-generation";
+import { createMockProposalRepository } from "@/lib/proposals";
 import type { GeneratedProposalContent, ProposalGenerationInput } from "@/types/proposal-generation";
 
 /**
@@ -488,24 +489,67 @@ function AINextSteps({ content }: { content: GeneratedProposalContent["recommend
 
 export default async function ProposalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const proposal = getProposalById(id);
+  
+  // Try to get the proposal record from the repository first
+  const proposalRepository = createMockProposalRepository();
+  const proposalRecord = await proposalRepository.getById(id);
+  
+  let proposal = getProposalById(id);
+  let estimate: EstimateSummary | null = null;
+  let aiContent: GeneratedProposalContent | null = null;
+
+  // If we have a saved proposal record, use its data
+  if (proposalRecord) {
+    proposal = {
+      id: proposalRecord.id,
+      title: proposalRecord.title,
+      clientName: proposalRecord.clientName,
+      contactName: proposalRecord.contactName,
+      industry: proposalRecord.industry,
+      status: proposalRecord.status,
+      summary: proposalRecord.summary,
+      scope: proposalRecord.scope,
+      createdAt: proposalRecord.createdAt,
+      updatedAt: proposalRecord.updatedAt,
+      dueDate: proposalRecord.dueDate,
+      projectTypeId: proposalRecord.estimationInput.projectTypeId,
+      styleOptionId: proposalRecord.estimationInput.styleMultiplierId,
+      areaPing: proposalRecord.estimationInput.areaPing,
+      meetingRoomCount: proposalRecord.estimationInput.meetingRoomCount,
+      includeReceptionArea: proposalRecord.estimationInput.includeReceptionArea,
+      includePantry: proposalRecord.estimationInput.includePantry,
+      includeGlassPartitions: proposalRecord.estimationInput.includeGlassPartitions,
+      includeCustomStorage: proposalRecord.estimationInput.includeCustomStorage,
+      includeSmartOfficeSetup: proposalRecord.estimationInput.includeSmartOfficeSetup,
+      includeMEPWork: proposalRecord.estimationInput.includeMEPWork,
+      rushProject: proposalRecord.estimationInput.rushProject,
+      estimate: {
+        subtotal: proposalRecord.estimationResult.budget.final.min,
+        adjustmentTotal: proposalRecord.estimationResult.budget.adjustmentsImpact.min,
+        estimatedTotal: proposalRecord.estimationResult.budget.final.max,
+        confidenceLabel: getConfidenceLabel(proposalRecord.estimationResult),
+      },
+    };
+    estimate = proposalRecord.estimationResult;
+    aiContent = proposalRecord.generatedContent ?? null;
+  } else if (proposal) {
+    // Fall back to the legacy mock data if no record found
+    estimate = await getProposalEstimate(proposal);
+    if (!estimate) {
+      notFound();
+    }
+    const aiInput = buildAIGenerationInput(proposal, estimate);
+    aiContent = await getAIProposalContent(aiInput);
+  } else {
+    notFound();
+  }
 
   if (!proposal) {
     notFound();
   }
 
-  const estimate = await getProposalEstimate(proposal);
-
-  if (!estimate) {
-    notFound();
-  }
-
   const confidenceLabel = getConfidenceLabel(estimate);
   const includedOptions = getIncludedOptionsList(proposalToEstimationInput(proposal));
-  
-  // Generate AI proposal content
-  const aiInput = buildAIGenerationInput(proposal, estimate);
-  const aiContent = await getAIProposalContent(aiInput);
 
   return (
     <AppShell>
@@ -518,29 +562,33 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_360px]">
           <div className="space-y-6">
-            {/* AI-Generated Executive Summary */}
-            <AIExecutiveSummary content={aiContent.executiveSummary} />
+            {aiContent && (
+              <>
+                {/* AI-Generated Executive Summary */}
+                <AIExecutiveSummary content={aiContent.executiveSummary} />
 
-            {/* AI-Generated Project Understanding */}
-            <AIProjectUnderstanding content={aiContent.projectUnderstanding} />
+                {/* AI-Generated Project Understanding */}
+                <AIProjectUnderstanding content={aiContent.projectUnderstanding} />
 
-            {/* AI-Generated Design Direction */}
-            <AIDesignDirection content={aiContent.designDirection} />
+                {/* AI-Generated Design Direction */}
+                <AIDesignDirection content={aiContent.designDirection} />
 
-            {/* AI-Generated Spatial Planning */}
-            <AISpatialPlanning content={aiContent.spatialPlanningRecommendations} />
+                {/* AI-Generated Spatial Planning */}
+                <AISpatialPlanning content={aiContent.spatialPlanningRecommendations} />
 
-            {/* AI-Generated Budget Narrative */}
-            <AIBudgetNarrative content={aiContent.budgetNarrative} />
+                {/* AI-Generated Budget Narrative */}
+                <AIBudgetNarrative content={aiContent.budgetNarrative} />
 
-            {/* AI-Generated Timeline Narrative */}
-            <AITimelineNarrative content={aiContent.timelineNarrative} />
+                {/* AI-Generated Timeline Narrative */}
+                <AITimelineNarrative content={aiContent.timelineNarrative} />
 
-            {/* AI-Generated Risks & Assumptions */}
-            <AIRisksAndAssumptions content={aiContent.risksAndAssumptions} />
+                {/* AI-Generated Risks & Assumptions */}
+                <AIRisksAndAssumptions content={aiContent.risksAndAssumptions} />
 
-            {/* AI-Generated Next Steps */}
-            <AINextSteps content={aiContent.recommendedNextSteps} />
+                {/* AI-Generated Next Steps */}
+                <AINextSteps content={aiContent.recommendedNextSteps} />
+              </>
+            )}
 
             {/* Original Scope Priorities */}
             <SectionBlock title="Scope priorities" description="Structured summary of fit-out scope themes for generation and pricing automation.">
@@ -683,19 +731,20 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
               </div>
             </Card>
 
-            {/* AI Generation Metadata */}
-            <Card title="AI Generation" eyebrow="Content metadata">
-              <div className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
-                <p>Provider: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.provider}</span></p>
-                <p>Model: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.modelUsed}</span></p>
-                <p>Generated: <span className="font-medium text-[var(--color-text-primary)]">{formatDate(aiContent.metadata.generatedAt)}</span></p>
-                {aiContent.metadata.tokenUsage && (
-                  <p className="text-[var(--color-text-muted)]">
-                    Tokens: {aiContent.metadata.tokenUsage.totalTokens.toLocaleString()}
-                  </p>
-                )}
-              </div>
-            </Card>
+            {aiContent && (
+              <Card title="AI Generation" eyebrow="Content metadata">
+                <div className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
+                  <p>Provider: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.provider}</span></p>
+                  <p>Model: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.modelUsed}</span></p>
+                  <p>Generated: <span className="font-medium text-[var(--color-text-primary)]">{formatDate(aiContent.metadata.generatedAt)}</span></p>
+                  {aiContent.metadata.tokenUsage && (
+                    <p className="text-[var(--color-text-muted)]">
+                      Tokens: {aiContent.metadata.tokenUsage.totalTokens.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            )}
           </div>
         </div>
       </div>
