@@ -329,6 +329,9 @@ test("AI generation flow: design direction includes materials and finishes", asy
   // Wait for design direction section
   await expect(page.getByRole("heading", { name: "Design direction" })).toBeVisible({ timeout: 15000 });
 
+  // Expand the design direction accordion to see subsections
+  await page.getByRole("button", { name: "Design direction" }).click();
+
   // Verify design direction has subsections - use .first() to avoid strict mode
   await expect(page.getByText("Materials & finishes").first()).toBeVisible();
   await expect(page.getByText("Furniture & equipment").first()).toBeVisible();

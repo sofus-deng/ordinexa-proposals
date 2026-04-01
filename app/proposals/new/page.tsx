@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import {
+  Accordion,
+  AccordionItem,
   Button,
   Card,
   FieldWrapper,
@@ -340,39 +342,10 @@ function RecommendationCard({ recommendation }: { recommendation: SpatialRecomme
   );
 }
 
-function RiskAssumptionList({
-  title,
-  items,
-}: {
-  title: string;
-  items: RiskOrAssumption[];
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">{title}</p>
-      <div className="space-y-3">
-        {items.map((item) => (
-          <div
-            key={`${title}-${item.description}`}
-            className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="font-medium text-[var(--color-text-primary)]">{item.description}</p>
-              <ImpactBadge impact={item.impact} />
-            </div>
-            <p className="mt-2 text-[var(--text-xs)] leading-6 text-[var(--color-text-secondary)]">
-              {item.mitigationOrValidation}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function ProposalPreview({ content }: { content: GeneratedProposalContent }) {
   return (
     <div className="space-y-5">
+      {/* Executive summary - always visible */}
       <PreviewSection
         title="Executive summary"
         description="High-level positioning for the current project brief, budget, and timeline context."
@@ -382,126 +355,193 @@ function ProposalPreview({ content }: { content: GeneratedProposalContent }) {
         <p>{content.executiveSummary.recommendation}</p>
       </PreviewSection>
 
-      <PreviewSection title="Project understanding">
-        <p>{content.projectUnderstanding.businessContext}</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Objectives
-            </p>
-            <PreviewList items={content.projectUnderstanding.objectives} />
+      {/* Accordion sections for heavier content */}
+      <Accordion>
+        <AccordionItem
+          id="project-understanding"
+          title="Project understanding"
+          defaultOpen={false}
+        >
+          <p>{content.projectUnderstanding.businessContext}</p>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Objectives
+              </p>
+              <PreviewList items={content.projectUnderstanding.objectives} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Constraints
+              </p>
+              <PreviewList items={content.projectUnderstanding.constraints} />
+            </div>
           </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Constraints
-            </p>
-            <PreviewList items={content.projectUnderstanding.constraints} />
-          </div>
-        </div>
-        <p>{content.projectUnderstanding.spatialRequirements}</p>
-      </PreviewSection>
+          <p>{content.projectUnderstanding.spatialRequirements}</p>
+        </AccordionItem>
 
-      <PreviewSection title="Design direction">
-        <p>{content.designDirection.philosophy}</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Materials & finishes
-            </p>
-            <PreviewList items={content.designDirection.materialsFinishes} />
+        <AccordionItem
+          id="design-direction"
+          title="Design direction"
+          defaultOpen={false}
+        >
+          <p>{content.designDirection.philosophy}</p>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Materials & finishes
+              </p>
+              <PreviewList items={content.designDirection.materialsFinishes} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Furniture & equipment
+              </p>
+              <PreviewList items={content.designDirection.furnitureEquipment} />
+            </div>
           </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Furniture & equipment
-            </p>
-            <PreviewList items={content.designDirection.furnitureEquipment} />
-          </div>
-        </div>
-        <p><span className="font-semibold">Color palette:</span> {content.designDirection.colorPalette}</p>
-        <p><span className="font-semibold">Lighting approach:</span> {content.designDirection.lightingApproach}</p>
-      </PreviewSection>
+          <p><span className="font-semibold">Color palette:</span> {content.designDirection.colorPalette}</p>
+          <p><span className="font-semibold">Lighting approach:</span> {content.designDirection.lightingApproach}</p>
+        </AccordionItem>
 
-      <PreviewSection title="Spatial planning recommendations">
-        <p>{content.spatialPlanningRecommendations.overallStrategy}</p>
-        <div className="space-y-3">
-          {content.spatialPlanningRecommendations.areaRecommendations.map((recommendation) => (
-            <RecommendationCard
-              key={`${recommendation.area}-${recommendation.recommendation}`}
-              recommendation={recommendation}
-            />
-          ))}
-        </div>
-        <p><span className="font-semibold">Circulation flow:</span> {content.spatialPlanningRecommendations.circulationFlow}</p>
-        <p><span className="font-semibold">Flexibility:</span> {content.spatialPlanningRecommendations.flexibilityConsiderations}</p>
-      </PreviewSection>
+        <AccordionItem
+          id="spatial-planning"
+          title="Spatial planning recommendations"
+          defaultOpen={false}
+        >
+          <p>{content.spatialPlanningRecommendations.overallStrategy}</p>
+          <div className="space-y-3">
+            {content.spatialPlanningRecommendations.areaRecommendations.map((recommendation) => (
+              <RecommendationCard
+                key={`${recommendation.area}-${recommendation.recommendation}`}
+                recommendation={recommendation}
+              />
+            ))}
+          </div>
+          <p><span className="font-semibold">Circulation flow:</span> {content.spatialPlanningRecommendations.circulationFlow}</p>
+          <p><span className="font-semibold">Flexibility:</span> {content.spatialPlanningRecommendations.flexibilityConsiderations}</p>
+        </AccordionItem>
 
-      <PreviewSection title="Budget narrative">
-        <p>{content.budgetNarrative.overview}</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Cost breakdown
-            </p>
-            <PreviewList items={content.budgetNarrative.costBreakdown} />
+        <AccordionItem
+          id="budget-narrative"
+          title="Budget narrative"
+          defaultOpen={false}
+        >
+          <p>{content.budgetNarrative.overview}</p>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Cost breakdown
+              </p>
+              <PreviewList items={content.budgetNarrative.costBreakdown} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Value engineering
+              </p>
+              <PreviewList items={content.budgetNarrative.valueEngineeringOptions} />
+            </div>
           </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Value engineering
-            </p>
-            <PreviewList items={content.budgetNarrative.valueEngineeringOptions} />
-          </div>
-        </div>
-        <p>{content.budgetNarrative.confidenceExplanation}</p>
-      </PreviewSection>
+          <p>{content.budgetNarrative.confidenceExplanation}</p>
+        </AccordionItem>
 
-      <PreviewSection title="Timeline narrative">
-        <p>{content.timelineNarrative.overview}</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Milestones
-            </p>
-            <PreviewList items={content.timelineNarrative.milestones} />
+        <AccordionItem
+          id="timeline-narrative"
+          title="Timeline narrative"
+          defaultOpen={false}
+        >
+          <p>{content.timelineNarrative.overview}</p>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Milestones
+              </p>
+              <PreviewList items={content.timelineNarrative.milestones} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Critical path
+              </p>
+              <PreviewList items={content.timelineNarrative.criticalPath} />
+            </div>
           </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Critical path
-            </p>
-            <PreviewList items={content.timelineNarrative.criticalPath} />
-          </div>
-        </div>
-        <p>{content.timelineNarrative.confidenceExplanation}</p>
-      </PreviewSection>
+          <p>{content.timelineNarrative.confidenceExplanation}</p>
+        </AccordionItem>
 
-      <PreviewSection title="Risks and assumptions">
-        <div className="grid gap-4 lg:grid-cols-2">
-          <RiskAssumptionList title="Risks" items={content.risksAndAssumptions.risks} />
-          <RiskAssumptionList title="Assumptions" items={content.risksAndAssumptions.assumptions} />
-        </div>
-      </PreviewSection>
+        <AccordionItem
+          id="risks-assumptions"
+          title="Risks and assumptions"
+          defaultOpen={false}
+        >
+          <div className="space-y-4">
+            <div>
+              <p className="mb-3 text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">Risks</p>
+              <div className="space-y-3">
+                {content.risksAndAssumptions.risks.map((item) => (
+                  <div
+                    key={`risk-${item.description}`}
+                    className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
+                  >
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="font-medium text-[var(--color-text-primary)]">{item.description}</p>
+                      <ImpactBadge impact={item.impact} />
+                    </div>
+                    <p className="mt-2 text-[var(--text-xs)] leading-6 text-[var(--color-text-secondary)]">
+                      {item.mitigationOrValidation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-3 text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">Assumptions</p>
+              <div className="space-y-3">
+                {content.risksAndAssumptions.assumptions.map((item) => (
+                  <div
+                    key={`assumption-${item.description}`}
+                    className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
+                  >
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="font-medium text-[var(--color-text-primary)]">{item.description}</p>
+                      <ImpactBadge impact={item.impact} />
+                    </div>
+                    <p className="mt-2 text-[var(--text-xs)] leading-6 text-[var(--color-text-secondary)]">
+                      {item.mitigationOrValidation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </AccordionItem>
 
-      <PreviewSection title="Recommended next steps">
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Immediate
-            </p>
-            <PreviewList items={content.recommendedNextSteps.immediate} />
+        <AccordionItem
+          id="next-steps"
+          title="Recommended next steps"
+          defaultOpen={false}
+        >
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Immediate
+              </p>
+              <PreviewList items={content.recommendedNextSteps.immediate} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Short term
+              </p>
+              <PreviewList items={content.recommendedNextSteps.shortTerm} />
+            </div>
+            <div>
+              <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                Decision points
+              </p>
+              <PreviewList items={content.recommendedNextSteps.decisionPoints} />
+            </div>
           </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Short term
-            </p>
-            <PreviewList items={content.recommendedNextSteps.shortTerm} />
-          </div>
-          <div>
-            <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Decision points
-            </p>
-            <PreviewList items={content.recommendedNextSteps.decisionPoints} />
-          </div>
-        </div>
-      </PreviewSection>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
@@ -731,7 +771,7 @@ export default function NewProposalPage() {
 
         <StepIndicator steps={STEPS} currentStep={currentStep} />
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_400px]">
+        <div className={`grid gap-6 ${generatedProposal ? "xl:grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)]" : "xl:grid-cols-[minmax(0,1.55fr)_400px]"}`}>
           <Card title="Project details" eyebrow="Step 1">
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleCalculateEstimate(); }}>
               <SectionBlock title="Project parameters" description="Core inputs that define the baseline budget and timeline.">
