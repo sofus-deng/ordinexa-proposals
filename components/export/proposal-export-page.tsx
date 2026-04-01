@@ -40,7 +40,7 @@ export function ProposalExportLayout({ viewModel }: ProposalExportPageProps) {
       </ExportSection>
 
       {/* Project Understanding */}
-      <ExportSection title="Project Understanding" subtitle="AI-analyzed context">
+      <ExportSection title="Project Understanding" subtitle="Project context">
         {viewModel.generatedContent ? (
           <ExportProjectUnderstanding content={viewModel.generatedContent.projectUnderstanding} />
         ) : (
@@ -49,7 +49,7 @@ export function ProposalExportLayout({ viewModel }: ProposalExportPageProps) {
       </ExportSection>
 
       {/* Design Direction */}
-      <ExportSection title="Design Direction" subtitle="AI-recommended approach">
+      <ExportSection title="Design Direction" subtitle="Recommended approach">
         {viewModel.generatedContent ? (
           <ExportDesignDirection content={viewModel.generatedContent.designDirection} />
         ) : (
@@ -58,7 +58,7 @@ export function ProposalExportLayout({ viewModel }: ProposalExportPageProps) {
       </ExportSection>
 
       {/* Spatial Planning Recommendations */}
-      <ExportSection title="Spatial Planning" subtitle="AI-generated recommendations">
+      <ExportSection title="Spatial Planning" subtitle="Recommendations">
         {viewModel.generatedContent ? (
           <ExportSpatialPlanning content={viewModel.generatedContent.spatialPlanningRecommendations} />
         ) : (

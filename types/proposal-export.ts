@@ -7,7 +7,6 @@
  */
 
 import type { GeneratedProposalContent } from "./proposal-generation";
-import type { ProposalStatus } from "./proposal";
 
 /**
  * Client-facing metadata for the proposal export.
@@ -25,8 +24,8 @@ export interface ExportMetadata {
   /** Industry sector */
   industry: string;
 
-  /** Current proposal status */
-  status: ProposalStatus;
+  /** Current proposal status (client-facing label) */
+  status: string;
 
   /** Brief project summary */
   summary: string;

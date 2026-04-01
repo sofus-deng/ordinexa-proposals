@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { ButtonLink, Card, PageHeader, SectionBlock } from "@/components/ui";
 import { getProposalById } from "@/data";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatDate, formatCurrencyRange, formatTimelineRange } from "@/lib/format";
 import {
   calculateEstimate,
   createMockPricingRepository,
@@ -38,26 +38,6 @@ async function getProposalEstimate(proposal: {
   const repository = createMockPricingRepository();
   const input = proposalToEstimationInput(proposal);
   return calculateEstimate(repository, input);
-}
-
-/**
- * Formats a budget range for display.
- */
-function formatBudgetRange(min: number, max: number, currency: string): string {
-  if (min === max) {
-    return formatCurrency(min, currency);
-  }
-  return `${formatCurrency(min, currency)} – ${formatCurrency(max, currency)}`;
-}
-
-/**
- * Formats a timeline range for display.
- */
-function formatTimelineRange(minWeeks: number, maxWeeks: number): string {
-  if (minWeeks === maxWeeks) {
-    return `${minWeeks} weeks`;
-  }
-  return `${minWeeks} – ${maxWeeks} weeks`;
 }
 
 /**
@@ -177,11 +157,11 @@ function ImpactBadge({ impact }: { impact: "low" | "medium" | "high" }) {
 }
 
 /**
- * Renders the AI-generated executive summary section.
+ * Renders the executive summary section.
  */
 function AIExecutiveSummary({ content }: { content: GeneratedProposalContent["executiveSummary"] }) {
   return (
-    <Card title="AI-Generated Executive Summary" eyebrow="Strategic overview">
+    <Card title="Executive Summary" eyebrow="Strategic overview">
       <div className="space-y-5 text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -207,11 +187,11 @@ function AIExecutiveSummary({ content }: { content: GeneratedProposalContent["ex
 }
 
 /**
- * Renders the AI-generated project understanding section.
+ * Renders the project understanding section.
  */
 function AIProjectUnderstanding({ content }: { content: GeneratedProposalContent["projectUnderstanding"] }) {
   return (
-    <Card title="Project Understanding" eyebrow="AI-analyzed context">
+    <Card title="Project Understanding" eyebrow="Project context">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -243,11 +223,11 @@ function AIProjectUnderstanding({ content }: { content: GeneratedProposalContent
 }
 
 /**
- * Renders the AI-generated design direction section.
+ * Renders the design direction section.
  */
 function AIDesignDirection({ content }: { content: GeneratedProposalContent["designDirection"] }) {
   return (
-    <Card title="Design Direction" eyebrow="AI-recommended approach">
+    <Card title="Design Direction" eyebrow="Recommended approach">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -285,11 +265,11 @@ function AIDesignDirection({ content }: { content: GeneratedProposalContent["des
 }
 
 /**
- * Renders the AI-generated spatial planning section.
+ * Renders the spatial planning section.
  */
 function AISpatialPlanning({ content }: { content: GeneratedProposalContent["spatialPlanningRecommendations"] }) {
   return (
-    <Card title="Spatial Planning" eyebrow="AI-generated recommendations">
+    <Card title="Spatial Planning" eyebrow="Recommendations">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -332,11 +312,11 @@ function AISpatialPlanning({ content }: { content: GeneratedProposalContent["spa
 }
 
 /**
- * Renders the AI-generated budget narrative section.
+ * Renders the budget narrative section.
  */
 function AIBudgetNarrative({ content }: { content: GeneratedProposalContent["budgetNarrative"] }) {
   return (
-    <Card title="Budget Narrative" eyebrow="AI-generated cost explanation">
+    <Card title="Budget Narrative" eyebrow="Cost explanation">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -368,11 +348,11 @@ function AIBudgetNarrative({ content }: { content: GeneratedProposalContent["bud
 }
 
 /**
- * Renders the AI-generated timeline narrative section.
+ * Renders the timeline narrative section.
  */
 function AITimelineNarrative({ content }: { content: GeneratedProposalContent["timelineNarrative"] }) {
   return (
-    <Card title="Timeline Narrative" eyebrow="AI-generated schedule">
+    <Card title="Timeline Narrative" eyebrow="Project schedule">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -404,11 +384,11 @@ function AITimelineNarrative({ content }: { content: GeneratedProposalContent["t
 }
 
 /**
- * Renders the AI-generated risks and assumptions section.
+ * Renders the risks and assumptions section.
  */
 function AIRisksAndAssumptions({ content }: { content: GeneratedProposalContent["risksAndAssumptions"] }) {
   return (
-    <Card title="Risks & Assumptions" eyebrow="AI-identified factors">
+    <Card title="Risks & Assumptions" eyebrow="Key considerations">
       <div className="space-y-6">
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -458,11 +438,11 @@ function AIRisksAndAssumptions({ content }: { content: GeneratedProposalContent[
 }
 
 /**
- * Renders the AI-generated next steps section.
+ * Renders the next steps section.
  */
 function AINextSteps({ content }: { content: GeneratedProposalContent["recommendedNextSteps"] }) {
   return (
-    <Card title="Recommended Next Steps" eyebrow="AI-suggested actions">
+    <Card title="Recommended Next Steps" eyebrow="Action items">
       <div className="space-y-5">
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -556,7 +536,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
       <div className="space-y-8">
         <PageHeader
           title={proposal.title}
-          description="Comprehensive proposal with AI-generated narrative and calculated estimates."
+          description="Complete proposal with detailed estimates and project recommendations."
           action={
             <div className="flex gap-3">
               <ButtonLink href={`/proposals/${id}/export`} variant="primary">Open export view</ButtonLink>
@@ -596,7 +576,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             )}
 
             {/* Original Scope Priorities */}
-            <SectionBlock title="Scope priorities" description="Structured summary of fit-out scope themes for generation and pricing automation.">
+            <SectionBlock title="Scope priorities" description="Key project scope themes and deliverables.">
               <ul className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
                 {proposal.scope.map((scopeItem) => (
                   <li key={scopeItem} className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
@@ -607,7 +587,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             </SectionBlock>
 
             {/* Original Fit-out Options */}
-            <Card title="Fit-out options" eyebrow="Selected scope items">
+            <Card title="Fit-out options" eyebrow="Included features">
               {includedOptions.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {includedOptions.map((option) => (
@@ -636,7 +616,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                     Baseline ({estimate.projectType.name})
                   </p>
                   <p className="mt-1 text-[var(--text-base)] font-semibold text-[var(--color-text-primary)]">
-                    {formatBudgetRange(estimate.budget.baseline.min, estimate.budget.baseline.max, estimate.currency)}
+                    {formatCurrencyRange(estimate.budget.baseline.min, estimate.budget.baseline.max, estimate.currency)}
                   </p>
                 </div>
 
@@ -657,7 +637,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                     <div className="flex items-center justify-between">
                       <span>Options impact</span>
                       <span className={`font-semibold ${estimate.budget.adjustmentsImpact.min >= 0 ? "text-[var(--color-text-primary)]" : "text-green-600"}`}>
-                        {formatBudgetRange(estimate.budget.adjustmentsImpact.min, estimate.budget.adjustmentsImpact.max, estimate.currency)}
+                        {formatCurrencyRange(estimate.budget.adjustmentsImpact.min, estimate.budget.adjustmentsImpact.max, estimate.currency)}
                       </span>
                     </div>
                   ) : null}
@@ -666,7 +646,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                 <div className="flex items-center justify-between border-t border-[var(--color-border)] pt-4">
                   <span className="font-semibold text-[var(--color-text-primary)]">Estimated budget</span>
                   <span className="text-[var(--text-xl)] font-semibold text-[var(--color-text-primary)]">
-                    {formatBudgetRange(estimate.budget.final.min, estimate.budget.final.max, estimate.currency)}
+                    {formatCurrencyRange(estimate.budget.final.min, estimate.budget.final.max, estimate.currency)}
                   </span>
                 </div>
 
@@ -722,34 +702,16 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
               </div>
             </Card>
 
-            {/* Internal Notes */}
-            <Card title="Internal notes" eyebrow="Readiness">
+            {/* Project Details */}
+            <Card title="Project details" eyebrow="Overview">
               <div className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
                 <p>Created {formatDate(proposal.createdAt)}</p>
                 <p>Last updated {formatDate(proposal.updatedAt)}</p>
                 <p>Industry: {proposal.industry}</p>
                 <p>Area: {proposal.areaPing} ping</p>
                 <p>Meeting rooms: {proposal.meetingRoomCount}</p>
-                <p className="text-[var(--color-text-muted)]">
-                  Budget and timeline are calculated dynamically from project parameters using the estimation engine.
-                </p>
               </div>
             </Card>
-
-            {aiContent && (
-              <Card title="AI Generation" eyebrow="Content metadata">
-                <div className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
-                  <p>Provider: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.provider}</span></p>
-                  <p>Model: <span className="font-medium text-[var(--color-text-primary)]">{aiContent.metadata.modelUsed}</span></p>
-                  <p>Generated: <span className="font-medium text-[var(--color-text-primary)]">{formatDate(aiContent.metadata.generatedAt)}</span></p>
-                  {aiContent.metadata.tokenUsage && (
-                    <p className="text-[var(--color-text-muted)]">
-                      Tokens: {aiContent.metadata.tokenUsage.totalTokens.toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              </Card>
-            )}
           </div>
         </div>
       </div>

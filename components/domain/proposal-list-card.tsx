@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { ProposalRecord } from "@/types/proposal-record";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrency, formatDate, formatTimelineRange } from "@/lib/format";
 import { StatusBadge } from "@/components/ui";
 
 interface ProposalListCardProps {
@@ -14,7 +14,6 @@ export function ProposalListCard({ proposal }: ProposalListCardProps) {
   const budgetRange = proposal.estimationResult.budget.final;
   const estimatedTotal = (budgetRange.min + budgetRange.max) / 2;
   const timelineWeeks = proposal.estimationResult.timeline.final;
-  const avgWeeks = (timelineWeeks.minWeeks + timelineWeeks.maxWeeks) / 2;
 
   return (
     <Link
@@ -45,7 +44,7 @@ export function ProposalListCard({ proposal }: ProposalListCardProps) {
           {formatCurrency(estimatedTotal, currency)}
         </p>
         <p className="text-[var(--text-xs)] text-[var(--color-text-secondary)]">
-          {avgWeeks.toFixed(0)} weeks
+          {formatTimelineRange(timelineWeeks.minWeeks, timelineWeeks.maxWeeks)}
         </p>
       </div>
 

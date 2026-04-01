@@ -56,13 +56,13 @@ export function ExportHeader({ metadata }: ExportHeaderProps) {
         <div>
           <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Included Features</h3>
           <ul className="space-y-1 text-[var(--color-text-secondary)]">
-            {metadata.includeReceptionArea && <li>• Reception Area</li>}
+            {metadata.includeReceptionArea && <li>• Reception area</li>}
             {metadata.includePantry && <li>• Pantry</li>}
-            {metadata.includeGlassPartitions && <li>• Glass Partitions</li>}
-            {metadata.includeCustomStorage && <li>• Custom Storage</li>}
-            {metadata.includeSmartOfficeSetup && <li>• Smart Office Setup</li>}
-            {metadata.includeMEPWork && <li>• MEP Work</li>}
-            {metadata.rushProject && <li>• Rush Project</li>}
+            {metadata.includeGlassPartitions && <li>• Glass partitions</li>}
+            {metadata.includeCustomStorage && <li>• Custom storage</li>}
+            {metadata.includeSmartOfficeSetup && <li>• Smart office setup</li>}
+            {metadata.includeMEPWork && <li>• MEP work</li>}
+            {metadata.rushProject && <li>• Rush project</li>}
           </ul>
         </div>
       </div>

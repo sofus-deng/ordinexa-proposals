@@ -9,6 +9,7 @@
 import type { ProposalRecord } from "@/types/proposal-record";
 import type { ProposalExportViewModel, ExportMetadata, ExportEstimationSummary } from "@/types/proposal-export";
 import { getIncludedOptionsList } from "@/lib/estimation";
+import { formatStatus, formatProjectType, formatStyle } from "@/lib/format";
 
 /**
  * Calculates confidence label based on estimate spread.
@@ -33,14 +34,14 @@ function buildExportMetadata(record: ProposalRecord): ExportMetadata {
     clientName: record.clientName,
     contactName: record.contactName,
     industry: record.industry,
-    status: record.status,
+    status: formatStatus(record.status),
     summary: record.summary,
     scope: record.scope,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
     dueDate: record.dueDate,
-    projectTypeName: record.estimationResult.projectType.name,
-    styleOptionName: record.estimationResult.styleOption.name,
+    projectTypeName: formatProjectType(record.estimationResult.projectType.id),
+    styleOptionName: formatStyle(record.estimationResult.styleOption.id),
     areaPing: record.estimationInput.areaPing,
     meetingRoomCount: record.estimationInput.meetingRoomCount,
     includeReceptionArea: record.estimationInput.includeReceptionArea,

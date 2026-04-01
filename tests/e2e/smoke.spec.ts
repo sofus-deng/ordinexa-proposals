@@ -144,7 +144,7 @@ test("proposal detail: loads existing proposal with calculated estimate", async 
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
   // Verify executive summary card exists
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
 });
 
 test("proposal detail: displays budget estimate section", async ({ page }) => {
@@ -220,7 +220,7 @@ test("proposal detail: executive summary contains calculated values", async ({ p
   await page.goto("/proposals/ordx-1001");
 
   // Verify executive summary card
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
 
   // Verify budget range is mentioned in summary (use first to avoid strict mode)
   const budgetRange = page.locator("text=/NT\\$[\\d,]+K-[\\d,]+K budget range/").first();
@@ -360,8 +360,8 @@ test("AI detail page: loads proposal with AI-generated content sections", async 
   // Verify proposal title
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
-  // Verify AI-generated executive summary is visible
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  // Verify executive summary is visible
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
 
   // Verify AI-generated project understanding is visible
   await expect(page.getByRole("heading", { name: "Project Understanding" })).toBeVisible();
@@ -377,7 +377,7 @@ test("AI detail page: AI content sections are distinct and complete", async ({ p
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
   // Verify multiple AI content sections are visible
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Project Understanding" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Design Direction" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Spatial Planning" })).toBeVisible();
@@ -429,7 +429,7 @@ test("AI detail page: executive summary contains overview and value proposition"
   await page.goto("/proposals/ordx-1001");
 
   // Wait for AI executive summary
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
 
   // Verify executive summary subsections - use .first() to avoid strict mode violations
   await expect(page.getByRole("heading", { name: "Overview" }).first()).toBeVisible();
@@ -437,19 +437,19 @@ test("AI detail page: executive summary contains overview and value proposition"
   await expect(page.getByRole("heading", { name: "Recommendation" }).first()).toBeVisible();
 });
 
-test("AI detail page: AI generation metadata is displayed", async ({ page }) => {
+test("AI detail page: project details are displayed", async ({ page }) => {
   await page.goto("/proposals/ordx-1001");
 
   // Wait for page to load
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
-  // Verify AI Generation metadata card
-  await expect(page.getByRole("heading", { name: "AI Generation" })).toBeVisible();
+  // Verify project details card
+  await expect(page.getByRole("heading", { name: "Project details" })).toBeVisible();
 
-  // Verify metadata fields are shown
-  await expect(page.getByText("Provider:")).toBeVisible();
-  await expect(page.getByText("Model:")).toBeVisible();
-  await expect(page.getByText("Generated:")).toBeVisible();
+  // Verify project details fields are shown
+  await expect(page.getByText("Created")).toBeVisible();
+  await expect(page.getByText("Last updated")).toBeVisible();
+  await expect(page.getByText("Industry")).toBeVisible();
 });
 
 test("AI detail page: handles proposal with minimal options", async ({ page }) => {
@@ -460,7 +460,7 @@ test("AI detail page: handles proposal with minimal options", async ({ page }) =
   await expect(page.getByRole("heading", { name: "Branch Office Workspace Refresh" })).toBeVisible();
 
   // Verify AI content still renders
-  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Design Direction" })).toBeVisible();
 
   // Verify deterministic estimates are still shown
@@ -501,8 +501,8 @@ test("export route: includes proposal narrative content", async ({ page }) => {
 
   // Verify proposal narrative sections are present
   await expect(page.getByText("Strategic overview")).toBeVisible();
-  await expect(page.getByText("AI-analyzed context")).toBeVisible();
-  await expect(page.getByText("AI-recommended approach")).toBeVisible();
+  await expect(page.getByText("Project context")).toBeVisible();
+  await expect(page.getByText("Recommended approach")).toBeVisible();
 });
 
 test("export route: includes estimate summary content", async ({ page }) => {

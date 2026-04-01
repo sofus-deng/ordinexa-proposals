@@ -1,12 +1,12 @@
 /**
  * Export Budget & Timeline Component (ORDX-024B)
  *
- * Displays the budget and timeline summary with AI-generated narratives.
+ * Displays the budget and timeline summary with narratives.
  */
 
 import type { BudgetNarrative, TimelineNarrative } from "@/types/proposal-generation";
 import type { ExportEstimationSummary } from "@/types/proposal-export";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrencyRange, formatTimelineRange } from "@/lib/format";
 
 interface ExportBudgetTimelineProps {
   estimationSummary: ExportEstimationSummary;
@@ -26,40 +26,21 @@ export function ExportBudgetTimeline({
         <h4 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Budget Summary</h4>
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="text-[var(--color-text-muted)]">Minimum</p>
+            <p className="text-[var(--color-text-muted)]">Budget Range</p>
             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
-              {formatCurrency(estimationSummary.budgetRange.min, estimationSummary.currency)}
+              {formatCurrencyRange(estimationSummary.budgetRange.min, estimationSummary.budgetRange.max, estimationSummary.currency)}
             </p>
           </div>
           <div>
-            <p className="text-[var(--color-text-muted)]">Maximum</p>
+            <p className="text-[var(--color-text-muted)]">Timeline Range</p>
             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
-              {formatCurrency(estimationSummary.budgetRange.max, estimationSummary.currency)}
+              {formatTimelineRange(estimationSummary.timelineRange.minWeeks, estimationSummary.timelineRange.maxWeeks)}
             </p>
           </div>
           <div>
             <p className="text-[var(--color-text-muted)]">Confidence</p>
             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
               {estimationSummary.confidenceLabel}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Timeline Summary */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
-        <h4 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Timeline Summary</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-[var(--color-text-muted)]">Minimum Duration</p>
-            <p className="text-lg font-semibold text-[var(--color-text-primary)]">
-              {estimationSummary.timelineRange.minWeeks} weeks
-            </p>
-          </div>
-          <div>
-            <p className="text-[var(--color-text-muted)]">Maximum Duration</p>
-            <p className="text-lg font-semibold text-[var(--color-text-primary)]">
-              {estimationSummary.timelineRange.maxWeeks} weeks
             </p>
           </div>
         </div>
