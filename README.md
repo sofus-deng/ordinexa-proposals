@@ -21,7 +21,7 @@ Open [http://localhost:3000](http://localhost:3000). The root route redirects to
 
 ### Environment Setup
 
-The app uses mock data by default. To enable AI-powered proposal generation with Gemini:
+The app works in demo mode by default with a mock provider. To enable AI-powered proposal generation with Gemini:
 
 1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Add it to your `.env.local` file:
@@ -29,6 +29,12 @@ The app uses mock data by default. To enable AI-powered proposal generation with
    GEMINI_API_KEY=your_api_key_here
    ```
 3. The app will automatically use Gemini when the key is available
+
+**Demo Mode Behavior:**
+- When `GEMINI_API_KEY` is not set, the app uses a mock provider for demo purposes
+- The UI clearly indicates when demo mode is active
+- Mock provider generates realistic proposal content without requiring API calls
+- This is ideal for demos, development, and Vercel Hobby deployments
 
 See `.env.example` for all available environment variables.
 
@@ -82,17 +88,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### Vercel Demo Deployment
+### Vercel Hobby Demo Deployment
 
-For demo deployments on Vercel Hobby:
+For demo deployments on Vercel Hobby (free tier):
 
 1. Connect your repository to Vercel
-2. Add environment variables in Vercel project settings:
+2. Add the required environment variable in Vercel project settings:
    - `NEXT_PUBLIC_APP_URL`: Your deployed URL (e.g., `https://your-app.vercel.app`)
-   - `GEMINI_API_KEY`: Optional, for AI-powered generation
-   - Other variables from `.env.example` as needed
 3. Deploy
 
-The app will use mock data when `GEMINI_API_KEY` is not set.
+**Optional for AI-powered generation:**
+- `GEMINI_API_KEY`: Add this if you want to use Gemini AI for proposal generation
+- If not set, the app will automatically use demo mode with the mock provider
+
+The app is designed to work seamlessly in demo mode without any API keys, making it perfect for Vercel Hobby deployments and demos.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

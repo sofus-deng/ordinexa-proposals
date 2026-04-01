@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   Button,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui";
 import { projectTypes, styleOptions, activePricingRuleSet } from "@/data";
 import {
+  checkGeminiStatus,
   createMockProvider,
   createProvider,
   generateProposal,
@@ -32,6 +33,7 @@ import type {
   RiskOrAssumption,
   SpatialRecommendation,
 } from "@/types/proposal-generation";
+import type { ProviderStatus } from "@/lib/ai-generation";
 
 /**
  * Default form state for estimation inputs
@@ -138,9 +140,10 @@ function buildProposalGenerationInput(
 async function generateProposalWithFallback(
   input: ProposalGenerationInput,
   selectedProvider: ProviderOption
-): Promise<GeneratedProposalContent> {
+): Promise<{ content: GeneratedProposalContent; providerUsed: "gemini" | "mock" }> {
   if (selectedProvider === "mock") {
-    return generateProposal(createMockProvider({ deterministic: true }), input);
+    const content = await generateProposal(createMockProvider({ deterministic: true }), input);
+    return { content, providerUsed: "mock" };
   }
 
   const geminiProvider = createProvider({
@@ -150,13 +153,15 @@ async function generateProposalWithFallback(
 
   if (await isProviderAvailable(geminiProvider)) {
     try {
-      return await generateProposal(geminiProvider, input);
+      const content = await generateProposal(geminiProvider, input);
+      return { content, providerUsed: "gemini" };
     } catch (error) {
       console.warn("Gemini generation failed, falling back to mock provider.", error);
     }
   }
 
-  return generateProposal(createMockProvider({ deterministic: true }), input);
+  const content = await generateProposal(createMockProvider({ deterministic: true }), input);
+  return { content, providerUsed: "mock" };
 }
 
 function PreviewSection({
@@ -425,9 +430,16 @@ export default function NewProposalPage() {
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [providerStatus, setProviderStatus] = useState<ProviderStatus | null>(null);
+  const [actualProviderUsed, setActualProviderUsed] = useState<"gemini" | "mock" | null>(null);
 
   const repository = useMemo(() => createMockPricingRepository(), []);
   const proposalRepository = useMemo(() => createMockProposalRepository(), []);
+
+  // Check provider status on mount
+  useEffect(() => {
+    checkGeminiStatus().then(setProviderStatus);
+  }, []);
 
   const updateField = useCallback(<K extends keyof EstimationInput>(
     field: K,
@@ -491,9 +503,10 @@ export default function NewProposalPage() {
       }
 
       const input = buildProposalGenerationInput(formData, resolvedEstimate);
-      const content = await generateProposalWithFallback(input, selectedProvider);
+      const result = await generateProposalWithFallback(input, selectedProvider);
 
-      setGeneratedProposal(content);
+      setGeneratedProposal(result.content);
+      setActualProviderUsed(result.providerUsed);
     } catch (error) {
       console.error("Proposal generation failed:", error);
       setGenerationError("Failed to generate proposal content. Please retry.");
@@ -720,6 +733,49 @@ export default function NewProposalPage() {
                     );
                   })}
                 </div>
+
+                {/* Provider status indicator */}
+                {providerStatus && (
+                  <div className={`mt-4 rounded-[var(--radius-lg)] border p-4 ${
+                    providerStatus.isAvailable
+                      ? "border-emerald-200 bg-emerald-50"
+                      : "border-amber-200 bg-amber-50"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                        providerStatus.isAvailable
+                          ? "bg-emerald-500"
+                          : "bg-amber-500"
+                      }`}>
+                        {providerStatus.isAvailable ? (
+                          <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-[var(--text-sm)] font-semibold ${
+                          providerStatus.isAvailable
+                            ? "text-emerald-800"
+                            : "text-amber-800"
+                        }`}>
+                          {providerStatus.isAvailable ? "Gemini AI available" : "Demo mode active"}
+                        </p>
+                        <p className={`mt-1 text-[var(--text-xs)] leading-5 ${
+                          providerStatus.isAvailable
+                            ? "text-emerald-700"
+                            : "text-amber-700"
+                        }`}>
+                          {providerStatus.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </SectionBlock>
 
               {validationErrors.length > 0 && (
@@ -959,13 +1015,18 @@ export default function NewProposalPage() {
                 <div className="space-y-5">
                   <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div>
+                      <div className="flex-1">
                         <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">
                           Structured proposal ready for review
                         </p>
                         <p className="mt-1 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
                           Provider: {toTitleCase(generatedProposal.metadata.provider)} · Model: {generatedProposal.metadata.modelUsed}
                         </p>
+                        {actualProviderUsed === "mock" && (
+                          <p className="mt-2 text-[var(--text-xs)] text-amber-700">
+                            <span className="font-semibold">Demo mode:</span> This proposal was generated using the mock provider for demonstration purposes.
+                          </p>
+                        )}
                       </div>
                       <span className="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
                         {new Date(generatedProposal.metadata.generatedAt).toLocaleString("en-US", {

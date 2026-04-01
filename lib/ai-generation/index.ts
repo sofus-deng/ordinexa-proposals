@@ -26,6 +26,14 @@ export type { GeminiProviderConfig } from "./providers/gemini-provider";
 export { MockProvider, createMockProvider } from "./providers/mock-provider";
 export type { MockProviderConfig } from "./providers/mock-provider";
 
+// Provider status utility
+export {
+  checkGeminiStatus,
+  getProviderWithStatus,
+  getProviderStatusBadge,
+} from "./provider-status";
+export type { ProviderStatus } from "./provider-status";
+
 // Prompt builder
 export {
   buildProposalPrompt,
