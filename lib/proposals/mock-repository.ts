@@ -23,6 +23,7 @@ import type {
 } from "@/types/proposal-record";
 import type { Proposal } from "@/types/proposal";
 import { proposals as mockProposals } from "@/data/mock-proposals";
+import { generateMockContent } from "@/lib/ai-generation/providers/mock-provider";
 
 /**
  * In-memory storage for proposals.
@@ -47,6 +48,44 @@ function generateId(): string {
  * Used for backward compatibility with existing mock data.
  */
 function legacyToRecord(proposal: Proposal): ProposalRecord {
+  // Generate AI content for legacy mock proposals
+  const aiInput = {
+    projectContext: {
+      title: proposal.title,
+      clientName: proposal.clientName,
+      contactName: proposal.contactName,
+      industry: proposal.industry,
+      projectTypeName: proposal.projectTypeId,
+      styleOptionName: proposal.styleOptionId,
+      scope: proposal.scope,
+    },
+    estimationContext: {
+      areaPing: proposal.areaPing,
+      meetingRoomCount: proposal.meetingRoomCount,
+      includedOptions: [],
+      budgetRange: {
+        min: proposal.estimate.estimatedTotal,
+        max: proposal.estimate.estimatedTotal,
+        currency: "TWD",
+      },
+      timelineRange: {
+        minWeeks: 8,
+        maxWeeks: 12,
+      },
+      styleMultiplier: 1.0,
+      isRushProject: proposal.rushProject,
+    },
+    fitOutOptions: {
+      includeReceptionArea: proposal.includeReceptionArea,
+      includePantry: proposal.includePantry,
+      includeGlassPartitions: proposal.includeGlassPartitions,
+      includeCustomStorage: proposal.includeCustomStorage,
+      includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
+      includeMEPWork: proposal.includeMEPWork,
+    },
+  };
+  const generatedContent = generateMockContent(aiInput, "mock-provider-v1");
+
   return {
     id: proposal.id,
     title: proposal.title,
@@ -122,10 +161,10 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
           maxWeeks: 12,
         },
         adjustmentsWeeks: 0,
-        rushCompression: 0,
+        rushCompression: proposal.rushProject ? 0.75 : 0,
         final: {
-          minWeeks: 8,
-          maxWeeks: 12,
+          minWeeks: proposal.rushProject ? 6 : 8,
+          maxWeeks: proposal.rushProject ? 9 : 12,
         },
         breakdown: {
           baseline: {
@@ -133,12 +172,13 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
             maxWeeks: 12,
           },
           adjustments: [],
-          rushCompression: 0,
+          rushCompression: proposal.rushProject ? 0.75 : 0,
           totalAdjustmentWeeks: 0,
         },
       },
       currency: "TWD",
     },
+    generatedContent,
   };
 }
 

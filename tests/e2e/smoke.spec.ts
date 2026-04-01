@@ -223,7 +223,7 @@ test("proposal detail: executive summary contains calculated values", async ({ p
   await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
 
   // Verify budget range is mentioned in summary (use first to avoid strict mode)
-  const budgetRange = page.locator("text=/\\$[\\d,]+ – \\$[\\d,]+/").first();
+  const budgetRange = page.locator("text=/NT\\$[\\d,]+K-[\\d,]+K budget range/").first();
   await expect(budgetRange).toBeVisible();
 
   // Verify timeline is mentioned in summary

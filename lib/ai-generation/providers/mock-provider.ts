@@ -155,7 +155,7 @@ const DOMAIN_TEMPLATES = {
 
   timelineNarrative: {
     overview: (weeks: { minWeeks: number; maxWeeks: number }) =>
-      `The project is estimated to span ${weeks.minWeeks}-${weeks.maxWeeks} weeks from design confirmation to final handover, organized into distinct phases with clear milestones and decision points.`,
+      `The project is estimated to span ${weeks.minWeeks} – ${weeks.maxWeeks} weeks from design confirmation to final handover, organized into distinct phases with clear milestones and decision points.`,
     milestones: [
       "Week 1-2: Design finalization and material selection approval",
       "Week 3-4: Permit submissions and contractor procurement",
@@ -247,7 +247,7 @@ const DOMAIN_TEMPLATES = {
 /**
  * Generate mock proposal content based on input.
  */
-function generateMockContent(
+export function generateMockContent(
   input: ProposalGenerationInput,
   model: string
 ): GeneratedProposalContent {
