@@ -15,3 +15,4 @@ export { ExportSpatialPlanning } from "./export-spatial-planning";
 export { ExportBudgetTimeline } from "./export-budget-timeline";
 export { ExportRisksAndAssumptions } from "./export-risks-assumptions";
 export { ExportNextSteps } from "./export-next-steps";
+export { ExportPrintActions } from "./export-print-actions";

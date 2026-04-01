@@ -15,6 +15,7 @@ import { ExportSpatialPlanning } from "./export-spatial-planning";
 import { ExportBudgetTimeline } from "./export-budget-timeline";
 import { ExportRisksAndAssumptions } from "./export-risks-assumptions";
 import { ExportNextSteps } from "./export-next-steps";
+import { ExportPrintActions } from "./export-print-actions";
 
 interface ProposalExportPageProps {
   viewModel: ProposalExportViewModel;
@@ -22,7 +23,10 @@ interface ProposalExportPageProps {
 
 export function ProposalExportLayout({ viewModel }: ProposalExportPageProps) {
   return (
-    <div className="mx-auto max-w-4xl bg-[var(--color-surface)] p-8 text-[var(--color-text-primary)]">
+    <div className="mx-auto max-w-4xl bg-[var(--color-surface)] p-8 text-[var(--color-text-primary)] print:p-0 print:bg-white">
+      {/* Print Actions - Hidden during actual printing */}
+      <ExportPrintActions />
+
       {/* Header with metadata */}
       <ExportHeader metadata={viewModel.metadata} />
 

@@ -112,3 +112,153 @@ textarea {
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
 }
+
+/* Print Styles (ORDX-025C) */
+@media print {
+  /* Hide non-printable elements */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 15mm 20mm;
+  }
+
+  /* Reset body and container for print */
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Main export container */
+  .min-h-screen {
+    min-height: auto !important;
+  }
+
+  /* Remove shadows and backgrounds for cleaner print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Improve text readability */
+  p, li, td, th, span, div {
+    color: black !important;
+  }
+
+  /* Ensure headings are visible */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+
+  /* Avoid page breaks inside sections */
+  section,
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Avoid page breaks after headings */
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Improve table printing */
+  table {
+    break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Remove rounded corners in print */
+  * {
+    border-radius: 0 !important;
+  }
+
+  /* Simplify borders for print */
+  * {
+    border-color: #ccc !important;
+  }
+
+  /* Improve contrast for muted text */
+  .text-\[var\(--color-text-muted\)\],
+  .text-\[var\(--color-text-secondary\)\] {
+    color: #333 !important;
+  }
+
+  /* Ensure primary colors print correctly */
+  .text-\[var\(--color-primary\)\],
+  .text-\[var\(--color-primary-emphasis\)\] {
+    color: #000 !important;
+  }
+
+  .border-\[var\(--color-primary\)\] {
+    border-color: #000 !important;
+  }
+
+  .bg-\[var\(--color-primary-soft\)\],
+  .bg-\[var\(--color-surface-muted\)\] {
+    background: #f5f5f5 !important;
+  }
+
+  /* Remove unnecessary spacing in print */
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mb-10 {
+    margin-bottom: 2rem !important;
+  }
+
+  .mt-12 {
+    margin-top: 2rem !important;
+  }
+
+  /* Ensure footer appears at bottom of last page */
+  footer {
+    margin-top: 3rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid #ccc !important;
+  }
+
+  /* Grid adjustments for print */
+  .grid {
+    display: grid !important;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+
+  /* Ensure links are handled properly */
+  a {
+    text-decoration: underline !important;
+    color: #000 !important;
+  }
+
+  /* Hide URL printing */
+  a[href^="http"]::after {
+    content: "" !important;
+  }
+}

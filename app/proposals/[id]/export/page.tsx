@@ -32,7 +32,7 @@ export default async function ProposalExportPage({ params }: ExportPageProps) {
   const viewModel = buildExportViewModel(proposalRecord);
 
   return (
-    <div className="min-h-screen bg-[var(--color-canvas)]">
+    <div className="min-h-screen bg-[var(--color-canvas)] print:bg-white print:min-h-0">
       <ProposalExportLayout viewModel={viewModel} />
     </div>
   );
