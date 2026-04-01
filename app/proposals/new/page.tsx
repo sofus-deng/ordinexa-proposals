@@ -1020,17 +1020,17 @@ export default function NewProposalPage() {
             </form>
           </Card>
 
-          <div className="space-y-6">
+          <div className="space-y-7">
             <Card title="Budget estimate" eyebrow={estimate ? "Calculated" : "Pending"}>
               {estimate ? (
-                <div className="space-y-6">
+                <div className="space-y-7">
                   {/* Primary metrics */}
-                  <div className="space-y-4">
-                    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
+                  <div className="space-y-5">
+                    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
                       <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                         Estimated budget
                       </p>
-                      <p className="mt-1 text-2xl font-semibold text-[var(--color-text-primary)]">
+                      <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
                         {formatBudgetRange(
                           estimate.budget.final.min,
                           estimate.budget.final.max,
@@ -1038,11 +1038,11 @@ export default function NewProposalPage() {
                         )}
                       </p>
                     </div>
-                    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
+                    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
                       <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                         Estimated timeline
                       </p>
-                      <p className="mt-1 text-2xl font-semibold text-[var(--color-text-primary)]">
+                      <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
                         {formatTimelineRange(
                           estimate.timeline.final.minWeeks,
                           estimate.timeline.final.maxWeeks
@@ -1052,11 +1052,11 @@ export default function NewProposalPage() {
                   </div>
 
                   {/* Project configuration summary */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                       Configuration
                     </p>
-                    <div className="space-y-1 text-[var(--text-sm)]">
+                    <div className="space-y-2 text-[var(--text-sm)]">
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Project type</span>
                         <span className="font-medium text-[var(--color-text-primary)]">{estimate.projectType.name}</span>
@@ -1077,11 +1077,11 @@ export default function NewProposalPage() {
                   </div>
 
                   {/* Budget breakdown */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                       Budget breakdown
                     </p>
-                    <div className="space-y-1 text-[var(--text-sm)]">
+                    <div className="space-y-2 text-[var(--text-sm)]">
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Baseline</span>
                         <span className="font-medium text-[var(--color-text-primary)]">
@@ -1120,11 +1120,11 @@ export default function NewProposalPage() {
                   </div>
 
                   {/* Timeline breakdown */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                       Timeline breakdown
                     </p>
-                    <div className="space-y-1 text-[var(--text-sm)]">
+                    <div className="space-y-2 text-[var(--text-sm)]">
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Baseline</span>
                         <span className="font-medium text-[var(--color-text-primary)]">
@@ -1155,11 +1155,11 @@ export default function NewProposalPage() {
 
                   {/* Selected options */}
                   {estimate.input.includedOptions.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <p className="text-[var(--text-xs)] font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
                         Selected options
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2.5">
                         {estimate.input.includedOptions.map((option) => (
                           <span
                             key={option}
@@ -1173,18 +1173,30 @@ export default function NewProposalPage() {
                   )}
                 </div>
               ) : (
-              <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
-                <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
-                  <p className="text-[var(--color-text-primary)]">Configure your project to generate an estimate</p>
-                    <p className="mt-1">Select project type, style, area, and any additional scope options to calculate budget and timeline.</p>
+              <div className="space-y-5 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
+                  <p className="font-medium text-[var(--color-text-primary)]">Configure your project to generate an estimate</p>
+                    <p className="mt-2 leading-relaxed">Select project type, style, area, and any additional scope options to calculate budget and timeline.</p>
                   </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-[var(--color-text-primary)]">Quick guide</p>
-                    <ul className="space-y-2 leading-6">
-                      <li>Choose project type and interior style.</li>
-                      <li>Enter the total area in ping.</li>
-                      <li>Add optional scope items as needed.</li>
-                      <li>Click Generate estimate to see results.</li>
+                  <div className="space-y-3">
+                    <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">Quick guide</p>
+                    <ul className="space-y-3">
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Choose project type and interior style.</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Enter the total area in ping.</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Add optional scope items as needed.</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Click Generate estimate to see results.</span>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -1193,14 +1205,14 @@ export default function NewProposalPage() {
 
             <Card title="Proposal preview" eyebrow={generatedProposal ? "Ready" : "Pending"}>
               {generatedProposal ? (
-                <div className="space-y-5">
-                  <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+                <div className="space-y-6">
+                  <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-5">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex-1">
                         <p className="text-[var(--text-sm)] font-semibold text-[var(--color-text-primary)]">
                           Proposal ready for review
                         </p>
-                        <p className="mt-1 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
+                        <p className="mt-2 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
                           Source: {toTitleCase(generatedProposal.metadata.provider)} · {generatedProposal.metadata.modelUsed}
                         </p>
                         {actualProviderUsed === "mock" && (
@@ -1223,20 +1235,32 @@ export default function NewProposalPage() {
                   <ProposalPreview content={generatedProposal} />
                 </div>
               ) : (
-                <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
-                  <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
-                    <p className="text-[var(--color-text-primary)]">Generate a proposal preview</p>
-                    <p className="mt-1">
+                <div className="space-y-5 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                  <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
+                    <p className="font-medium text-[var(--color-text-primary)]">Generate a proposal preview</p>
+                    <p className="mt-2 leading-relaxed">
                       After generating an estimate, click Generate proposal preview to create structured content for your client presentation.
                     </p>
                   </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-[var(--color-text-primary)]">Includes</p>
-                    <ul className="space-y-2 leading-6">
-                      <li>Executive summary and project understanding</li>
-                      <li>Design direction and spatial planning</li>
-                      <li>Budget and timeline narratives</li>
-                      <li>Risks, assumptions, and next steps</li>
+                  <div className="space-y-3">
+                    <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">Includes</p>
+                    <ul className="space-y-3">
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Executive summary and project understanding</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Design direction and spatial planning</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Budget and timeline narratives</span>
+                      </li>
+                      <li className="flex gap-3 leading-6">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                        <span>Risks, assumptions, and next steps</span>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -1244,20 +1268,32 @@ export default function NewProposalPage() {
             </Card>
 
             <Card title="Pricing reference" eyebrow="Active">
-              <div className="space-y-4 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
-                <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-4">
+              <div className="space-y-5 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
+                <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
                   <p className="text-[var(--text-base)] font-semibold text-[var(--color-text-primary)]">
                     {activePricingRuleSet.name}
                   </p>
-                  <p className="mt-1 leading-6">{activePricingRuleSet.notes}</p>
+                  <p className="mt-2 leading-relaxed">{activePricingRuleSet.notes}</p>
                 </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-[var(--color-text-primary)]">How estimates work</p>
-                  <ul className="space-y-2 leading-6">
-                    <li>Budget and timeline are calculated from base rates.</li>
-                    <li>Style selection adjusts finish level pricing.</li>
-                    <li>Scope options add percentage adjustments.</li>
-                    <li>All calculations are deterministic and repeatable.</li>
+                <div className="space-y-3">
+                  <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">How estimates work</p>
+                  <ul className="space-y-3">
+                    <li className="flex gap-3 leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                      <span>Budget and timeline are calculated from base rates.</span>
+                    </li>
+                    <li className="flex gap-3 leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                      <span>Style selection adjusts finish level pricing.</span>
+                    </li>
+                    <li className="flex gap-3 leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                      <span>Scope options add percentage adjustments.</span>
+                    </li>
+                    <li className="flex gap-3 leading-6">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                      <span>All calculations are deterministic and repeatable.</span>
+                    </li>
                   </ul>
                 </div>
               </div>
