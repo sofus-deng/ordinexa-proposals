@@ -451,3 +451,69 @@ test("AI detail page: handles proposal with minimal options", async ({ page }) =
   await expect(page.getByRole("heading", { name: "Budget estimate" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Timeline estimate" })).toBeVisible();
 });
+
+
+// ORDX-026B: Playwright coverage for export route and export access flow
+
+test("export route: loads for existing proposal", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001/export");
+
+  // Verify the export route loads successfully
+  await expect(page).toHaveURL(/\/proposals\/ordx-1001\/export$/);
+});
+
+test("export route: displays client-facing sections", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001/export");
+
+  // Verify key client-facing sections are visible - use .first() to avoid strict mode
+  await expect(page.getByText("Executive Summary").first()).toBeVisible();
+  await expect(page.getByText("Project Understanding").first()).toBeVisible();
+  await expect(page.getByText("Design Direction").first()).toBeVisible();
+  await expect(page.getByText("Spatial Planning").first()).toBeVisible();
+  await expect(page.getByText("Budget & Timeline").first()).toBeVisible();
+});
+
+test("export route: displays print/save actions", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001/export");
+
+  // Verify print action is visible
+  await expect(page.getByRole("button", { name: /Print/ })).toBeVisible();
+});
+
+test("export route: includes proposal narrative content", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001/export");
+
+  // Verify proposal narrative sections are present
+  await expect(page.getByText("Strategic overview")).toBeVisible();
+  await expect(page.getByText("AI-analyzed context")).toBeVisible();
+  await expect(page.getByText("AI-recommended approach")).toBeVisible();
+});
+
+test("export route: includes estimate summary content", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001/export");
+
+  // Verify estimate summary is present
+  await expect(page.getByText("Cost and schedule overview")).toBeVisible();
+  await expect(page.getByText("Budget & Timeline")).toBeVisible();
+});
+
+test("export route: 404 for non-existent proposal", async ({ page }) => {
+  await page.goto("/proposals/non-existent-id/export");
+
+  // Verify 404 page is shown
+  await expect(page.getByText("404")).toBeVisible();
+});
+
+test("export access flow: from detail page to export view", async ({ page }) => {
+  await page.goto("/proposals/ordx-1001");
+
+  // Verify detail page loads
+  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+
+  // Click the export button
+  await page.getByRole("link", { name: "Open export view" }).click();
+
+  // Verify export route loads
+  await expect(page).toHaveURL(/\/proposals\/ordx-1001\/export$/);
+  await expect(page.getByText("Executive Summary").first()).toBeVisible();
+});

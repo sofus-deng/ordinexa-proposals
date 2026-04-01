@@ -2,14 +2,35 @@ This is Ordinexa Proposals, a premium light-first B2B proposal workspace built o
 
 ## Getting Started
 
-First, install dependencies and run the development server:
+### Local Development
+
+First, install dependencies and set up the environment:
 
 ```bash
+# Install dependencies
 pnpm install
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Run the development server
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). The root route redirects to `/dashboard`.
+
+### Environment Setup
+
+The app uses mock data by default. To enable AI-powered proposal generation with Gemini:
+
+1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Add it to your `.env.local` file:
+   ```
+   GEMINI_API_KEY=your_api_key_here
+   ```
+3. The app will automatically use Gemini when the key is available
+
+See `.env.example` for all available environment variables.
 
 ## Available routes
 
@@ -60,5 +81,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+### Vercel Demo Deployment
+
+For demo deployments on Vercel Hobby:
+
+1. Connect your repository to Vercel
+2. Add environment variables in Vercel project settings:
+   - `NEXT_PUBLIC_APP_URL`: Your deployed URL (e.g., `https://your-app.vercel.app`)
+   - `GEMINI_API_KEY`: Optional, for AI-powered generation
+   - Other variables from `.env.example` as needed
+3. Deploy
+
+The app will use mock data when `GEMINI_API_KEY` is not set.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

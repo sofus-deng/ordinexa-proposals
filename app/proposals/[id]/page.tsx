@@ -557,7 +557,12 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
         <PageHeader
           title={proposal.title}
           description="Comprehensive proposal with AI-generated narrative and calculated estimates."
-          action={<ButtonLink href="/proposals/new" variant="secondary">Duplicate into new draft</ButtonLink>}
+          action={
+            <div className="flex gap-3">
+              <ButtonLink href={`/proposals/${id}/export`} variant="primary">Open export view</ButtonLink>
+              <ButtonLink href="/proposals/new" variant="secondary">Duplicate into new draft</ButtonLink>
+            </div>
+          }
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_360px]">
