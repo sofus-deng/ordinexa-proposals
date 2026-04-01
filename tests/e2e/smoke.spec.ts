@@ -144,7 +144,7 @@ test("proposal detail: loads existing proposal with calculated estimate", async 
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
   // Verify executive summary card exists
-  await expect(page.getByRole("heading", { name: "Executive proposal summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
 });
 
 test("proposal detail: displays budget estimate section", async ({ page }) => {
@@ -159,8 +159,8 @@ test("proposal detail: displays budget estimate section", async ({ page }) => {
   // Verify area impact is shown
   await expect(page.getByText(/Area impact/)).toBeVisible();
 
-  // Verify estimated budget total is shown
-  await expect(page.getByText("Estimated budget")).toBeVisible();
+  // Verify estimated budget total is shown - use .first() to avoid strict mode
+  await expect(page.getByText("Estimated budget").first()).toBeVisible();
 
   // Verify confidence indicator
   await expect(page.getByText(/Confidence:/)).toBeVisible();
@@ -185,7 +185,7 @@ test("proposal detail: displays fit-out options when selected", async ({ page })
 
   // Verify some options are displayed (ordx-1001 has reception, pantry, glass partitions, etc.)
   await expect(page.getByText("Reception Area", { exact: true })).toBeVisible();
-  await expect(page.getByText("Glass partitions")).toBeVisible();
+  await expect(page.getByText("Glass Partitions", { exact: true })).toBeVisible();
 });
 
 test("proposal detail: displays rush compression when applicable", async ({ page }) => {
@@ -220,7 +220,7 @@ test("proposal detail: executive summary contains calculated values", async ({ p
   await page.goto("/proposals/ordx-1001");
 
   // Verify executive summary card
-  await expect(page.getByRole("heading", { name: "Executive proposal summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI-Generated Executive Summary" })).toBeVisible();
 
   // Verify budget range is mentioned in summary (use first to avoid strict mode)
   const budgetRange = page.locator("text=/\\$[\\d,]+ – \\$[\\d,]+/").first();
@@ -294,8 +294,8 @@ test("AI generation flow: executive summary contains key sections", async ({ pag
   // Wait for executive summary section
   await expect(page.getByRole("heading", { name: "Executive summary" })).toBeVisible({ timeout: 15000 });
 
-  // Verify executive summary has descriptive content
-  const executiveSection = page.locator("section").filter({ hasText: "Executive summary" });
+  // Verify executive summary has descriptive content - use .first() to avoid strict mode
+  const executiveSection = page.locator("section").filter({ hasText: "Executive summary" }).first();
   await expect(executiveSection).toBeVisible();
 });
 
@@ -418,7 +418,7 @@ test("AI detail page: executive summary contains overview and value proposition"
   // Verify executive summary subsections - use .first() to avoid strict mode violations
   await expect(page.getByRole("heading", { name: "Overview" }).first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Value Proposition" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Recommendation" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recommendation" }).first()).toBeVisible();
 });
 
 test("AI detail page: AI generation metadata is displayed", async ({ page }) => {
