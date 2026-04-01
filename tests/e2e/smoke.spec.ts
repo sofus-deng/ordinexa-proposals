@@ -5,7 +5,7 @@ test("renders demo entry page at root", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Ordinexa Proposals" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open workspace demo" })).toBeVisible();
   await expect(page.getByRole("link", { name: "View sample proposal" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open export view" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export" })).toBeVisible();
 });
 
 test("renders new proposal form", async ({ page }) => {
@@ -532,7 +532,7 @@ test("export access flow: from detail page to export view", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
 
   // Click the export button
-  await page.getByRole("link", { name: "Open export view" }).click();
+  await page.getByRole("link", { name: "Export" }).click();
 
   // Verify export route loads
   await expect(page).toHaveURL(/\/proposals\/ordx-1001\/export$/);

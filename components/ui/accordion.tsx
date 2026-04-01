@@ -25,7 +25,7 @@ export function AccordionItem({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-start justify-between gap-4 p-5 text-left transition-colors hover:bg-[var(--color-surface-muted)]"
+        className="flex w-full items-start justify-between gap-4 rounded-[var(--radius-xl)] p-5 text-left transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)]"
         aria-expanded={isOpen}
         aria-controls={`accordion-content-${id}`}
       >

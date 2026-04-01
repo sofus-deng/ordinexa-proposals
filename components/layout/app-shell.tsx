@@ -3,13 +3,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LayoutDashboard, FilePlus, Settings } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", short: "DB" },
-  { href: "/proposals/new", label: "New Proposal", short: "NP" },
-  { href: "/settings/pricing", label: "Pricing Settings", short: "PS" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/proposals/new", label: "New Proposal", icon: FilePlus },
+  { href: "/settings/pricing", label: "Pricing Settings", icon: Settings },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -44,9 +45,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text-primary)]",
                   )}
                 >
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-surface-subtle)] text-[var(--text-xs)] font-semibold">
-                    {item.short}
-                  </span>
+                  <item.icon className="h-5 w-5 shrink-0" />
                   {item.label}
                 </Link>
               );

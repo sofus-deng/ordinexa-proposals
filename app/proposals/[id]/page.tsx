@@ -539,7 +539,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           description="Complete proposal with detailed estimates and project recommendations."
           action={
             <div className="flex gap-3">
-              <ButtonLink href={`/proposals/${id}/export`} variant="primary">Open export view</ButtonLink>
+              <ButtonLink href={`/proposals/${id}/export`} variant="primary">Export</ButtonLink>
               <ButtonLink href="/proposals/new" variant="secondary">Duplicate into new draft</ButtonLink>
             </div>
           }

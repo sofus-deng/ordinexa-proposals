@@ -140,7 +140,7 @@ function SaveSuccessState({
               variant="secondary"
               onClick={() => (window.location.href = `/proposals/${proposalId}/export`)}
             >
-              Export view
+              Export
             </Button>
           </>
         )}
@@ -999,9 +999,9 @@ export default function NewProposalPage() {
               )}
 
               {/* Action buttons with clear hierarchy */}
-              <div className="space-y-4">
-                {/* Primary action area */}
-                <div className="flex flex-wrap gap-3">
+              <div className="space-y-3">
+                {/* Primary actions - grouped together */}
+                <div className="flex flex-wrap items-center gap-3">
                   {!estimate ? (
                     <Button type="submit" disabled={isCalculating}>
                       {isCalculating ? "Calculating..." : "Generate estimate"}
@@ -1023,34 +1023,23 @@ export default function NewProposalPage() {
                       >
                         {isCalculating ? "Recalculating..." : "Recalculate estimate"}
                       </Button>
+                      <Button
+                        type="button"
+                        onClick={handleSaveProposal}
+                        disabled={isSaving || !generatedProposal}
+                        variant={generatedProposal ? "primary" : "secondary"}
+                      >
+                        {isSaving ? "Saving..." : "Save proposal"}
+                      </Button>
                     </>
                   )}
                 </div>
 
-                {/* Secondary action area - gated by proposal preview */}
-                {estimate && (
-                  <div className="flex flex-wrap gap-3 border-t border-[var(--color-border)] pt-4">
-                    <Button
-                      type="button"
-                      onClick={handleSaveProposal}
-                      disabled={isSaving || !generatedProposal}
-                      variant={generatedProposal ? "primary" : "secondary"}
-                    >
-                      {isSaving ? "Saving..." : "Save proposal"}
-                    </Button>
-                    {!generatedProposal && (
-                      <p className="flex items-center text-[var(--text-xs)] text-[var(--color-text-secondary)]">
-                        Generate a proposal preview first to enable saving.
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Reset action */}
+                {/* Secondary action */}
                 <div className="flex gap-3">
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="ghost"
                     onClick={handleReset}
                   >
                     Start over

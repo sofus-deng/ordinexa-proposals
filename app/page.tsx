@@ -26,7 +26,7 @@ export default function HomePage() {
             View sample proposal
           </ButtonLink>
           <ButtonLink href="/proposals/ordx-1001/export" variant="secondary">
-            Open export view
+            Export
           </ButtonLink>
         </div>
 
