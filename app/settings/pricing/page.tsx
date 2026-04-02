@@ -43,7 +43,7 @@ export default function PricingSettingsPage() {
               </div>
             </Card>
 
-            <Card title="Style options" eyebrow="Interior finish posture">
+            <Card title="Style options" eyebrow="Delivery posture">
               <div className="space-y-4">
                 {activePricingRuleSet.styleOptions.map((item) => (
                   <PricingRuleCard key={item.id} item={item} />
@@ -68,7 +68,7 @@ export default function PricingSettingsPage() {
               </div>
               <ul className="space-y-2">
                 <li>Project type baselines define default budget and timeline ranges.</li>
-                <li>Style options adjust estimates based on finish level and complexity.</li>
+                <li>Style options adjust estimates based on delivery model and complexity.</li>
                 <li>Adjustments provide modifiers for project-specific factors.</li>
               </ul>
             </div>
