@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("renders demo entry page at root", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Ordinexa Proposals" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open workspace demo" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open workspace" })).toBeVisible();
   await expect(page.getByRole("link", { name: "View sample proposal" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Export" })).toBeVisible();
 });
@@ -17,7 +17,7 @@ test("renders new proposal form", async ({ page }) => {
 
 test("renders proposal detail route", async ({ page }) => {
   await page.goto("/proposals/ordx-1001");
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Budget estimate" })).toBeVisible();
 });
 
@@ -57,21 +57,19 @@ test("estimation flow: generates estimate with default inputs", async ({ page })
 test("estimation flow: generates estimate with modified inputs", async ({ page }) => {
   await page.goto("/proposals/new");
 
-  // Modify project type using the select element
-  const projectTypeSelect = page.locator("select").first();
-  await projectTypeSelect.selectOption("commercial-showroom");
+  // Modify project type using the first combobox
+  const projectTypeSelect = page.getByRole("combobox").nth(0);
+  await projectTypeSelect.selectOption("customer-experience-program");
 
-  // Modify style using the second select element
-  const styleSelect = page.locator("select").nth(1);
-  await styleSelect.selectOption("premium-executive");
+  // Modify style using the second combobox
+  const styleSelect = page.getByRole("combobox").nth(1);
+  await styleSelect.selectOption("standard-delivery");
 
-  // Modify area using the number input
-  const areaInput = page.locator('input[type="number"]').first();
-  await areaInput.fill("200");
+  // Modify scope size using the first spinbutton
+  await page.getByRole("spinbutton").nth(0).fill("200");
 
-  // Modify meeting rooms
-  const meetingRoomInput = page.locator('input[type="number"]').nth(1);
-  await meetingRoomInput.fill("5");
+  // Modify complexity level using the second spinbutton
+  await page.getByRole("spinbutton").nth(1).fill("5");
 
   // Trigger estimate generation
   await page.getByRole("button", { name: "Generate estimate" }).click();
@@ -81,16 +79,16 @@ test("estimation flow: generates estimate with modified inputs", async ({ page }
   await expect(page.getByText("Estimated timeline")).toBeVisible();
 
   // Verify the configuration reflects the modified inputs
-  await expect(page.getByText("200 ping")).toBeVisible();
+  await expect(page.getByText("200", { exact: true }).last()).toBeVisible();
 });
 
 test("estimation flow: includes scope options in estimate", async ({ page }) => {
   await page.goto("/proposals/new");
 
   // Toggle some scope options
-  await page.getByRole("button", { name: /Reception area/ }).click();
-  await page.getByRole("button", { name: /Pantry facilities/ }).click();
-  await page.getByRole("button", { name: /Glass partitions/ }).click();
+  await page.getByRole("button", { name: /Discovery workshop/ }).click();
+  await page.getByRole("button", { name: /Training and enablement/ }).click();
+  await page.getByRole("button", { name: /Implementation support/ }).click();
 
   // Trigger estimate generation
   await page.getByRole("button", { name: "Generate estimate" }).click();
@@ -108,8 +106,8 @@ test("estimation flow: includes scope options in estimate", async ({ page }) => 
 test("estimation flow: rush project affects timeline", async ({ page }) => {
   await page.goto("/proposals/new");
 
-  // Enable rush project
-  await page.getByRole("button", { name: /Rush project/ }).click();
+  // Enable expedited delivery
+  await page.getByRole("button", { name: /Expedited delivery/ }).click();
 
   // Trigger estimate generation
   await page.getByRole("button", { name: "Generate estimate" }).click();
@@ -118,8 +116,8 @@ test("estimation flow: rush project affects timeline", async ({ page }) => {
   await expect(page.getByText("Estimated budget")).toBeVisible();
   await expect(page.getByText("Estimated timeline")).toBeVisible();
 
-  // Verify rush compression is shown in timeline breakdown
-  await expect(page.getByText("Rush compression")).toBeVisible();
+  // Verify expedited compression is shown in timeline breakdown
+  await expect(page.getByText("Expedited compression")).toBeVisible();
 });
 
 test("estimation flow: reset form clears estimate", async ({ page }) => {
@@ -133,7 +131,7 @@ test("estimation flow: reset form clears estimate", async ({ page }) => {
   await page.getByRole("button", { name: "Start over" }).click();
 
   // Verify estimate is cleared
-  await expect(page.getByText("Configure your project to generate an estimate")).toBeVisible();
+  await expect(page.getByText("Configure your engagement to generate an estimate")).toBeVisible();
 });
 
 
@@ -143,7 +141,7 @@ test("proposal detail: loads existing proposal with calculated estimate", async 
   await page.goto("/proposals/ordx-1001");
 
   // Verify proposal title
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify executive summary card exists
   await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
@@ -158,8 +156,8 @@ test("proposal detail: displays budget estimate section", async ({ page }) => {
   // Verify baseline is shown (use exact to avoid strict mode)
   await expect(page.getByText("Baseline", { exact: true })).toBeVisible();
 
-  // Verify area impact is shown
-  await expect(page.getByText(/Area impact/)).toBeVisible();
+  // Verify scope-size impact is shown
+  await expect(page.getByText(/Scope-size impact/)).toBeVisible();
 
   // Verify estimated budget total is shown - use .first() to avoid strict mode
   await expect(page.getByText("Estimated budget").first()).toBeVisible();
@@ -178,24 +176,24 @@ test("proposal detail: displays timeline estimate section", async ({ page }) => 
   await expect(page.getByText("Estimated timeline", { exact: true })).toBeVisible();
 });
 
-test("proposal detail: displays fit-out options when selected", async ({ page }) => {
-  // ordx-1001 has multiple fit-out options selected
+test("proposal detail: displays selected options when present", async ({ page }) => {
+  // ordx-1001 has multiple selected options
   await page.goto("/proposals/ordx-1001");
 
-  // Verify fit-out options card
-  await expect(page.getByRole("heading", { name: "Fit-out options" })).toBeVisible();
+  // Verify included modules section
+  await expect(page.getByText("Included modules")).toBeVisible();
 
-  // Verify some options are displayed (ordx-1001 has reception, pantry, glass partitions, etc.)
-  await expect(page.getByText("Reception Area", { exact: true })).toBeVisible();
-  await expect(page.getByText("Glass Partitions", { exact: true })).toBeVisible();
+  // Verify some modules are displayed for ordx-1001
+  await expect(page.getByText("Discovery Workshop", { exact: true })).toBeVisible();
+  await expect(page.getByText("Implementation Support", { exact: true })).toBeVisible();
 });
 
-test("proposal detail: displays rush compression when applicable", async ({ page }) => {
+test("proposal detail: displays expedited compression when applicable", async ({ page }) => {
   // ordx-1001 has rushProject: true
   await page.goto("/proposals/ordx-1001");
 
-  // Verify rush compression is shown in timeline
-  await expect(page.getByText("Rush compression")).toBeVisible();
+  // Verify expedited compression is shown in timeline
+  await expect(page.getByText("Expedited compression")).toBeVisible();
 });
 
 test("proposal detail: displays options impact in budget when applicable", async ({ page }) => {
@@ -211,7 +209,7 @@ test("proposal detail: handles proposal with minimal options", async ({ page }) 
   await page.goto("/proposals/ordx-1003");
 
   // Verify proposal loads
-  await expect(page.getByRole("heading", { name: "Branch Office Workspace Refresh" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Operational Improvement Engagement" })).toBeVisible();
 
   // Verify budget and timeline are still calculated
   await expect(page.getByRole("heading", { name: "Budget estimate" })).toBeVisible();
@@ -260,7 +258,7 @@ test("AI generation flow: generates proposal preview with default provider", asy
   await expect(page.getByRole("heading", { name: "Executive summary" })).toBeVisible({ timeout: 15000 });
 
   // Verify visible section headings
-  await expect(page.getByRole("heading", { name: "Design direction" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Proposed approach" })).toBeVisible();
 });
 
 test("AI generation flow: generates proposal preview with mock provider", async ({ page }) => {
@@ -284,8 +282,8 @@ test("AI generation flow: generates proposal preview with mock provider", async 
 
   // Verify multiple distinct AI-generated sections are present
   await expect(page.getByRole("heading", { name: "Project understanding" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Design direction" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Spatial planning recommendations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Proposed approach" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scope recommendations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Budget narrative" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Timeline narrative" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Risks and assumptions" })).toBeVisible();
@@ -313,7 +311,7 @@ test("AI generation flow: executive summary contains key sections", async ({ pag
   await expect(executiveSection).toBeVisible();
 });
 
-test("AI generation flow: design direction includes materials and finishes", async ({ page }) => {
+test("AI generation flow: proposed approach includes workstreams and delivery approach", async ({ page }) => {
   await page.goto("/proposals/new");
 
   // Select mock provider for deterministic results
@@ -326,15 +324,15 @@ test("AI generation flow: design direction includes materials and finishes", asy
   // Trigger AI proposal generation
   await page.getByRole("button", { name: "Generate proposal preview" }).click();
 
-  // Wait for design direction section
-  await expect(page.getByRole("heading", { name: "Design direction" })).toBeVisible({ timeout: 15000 });
+  // Wait for proposed approach section
+  await expect(page.getByRole("heading", { name: "Proposed approach" })).toBeVisible({ timeout: 15000 });
 
-  // Expand the design direction accordion to see subsections
-  await page.getByRole("button", { name: "Design direction" }).click();
+  // Expand the proposed approach accordion to see subsections
+  await page.getByRole("button", { name: "Proposed approach" }).click();
 
-  // Verify design direction has subsections - use .first() to avoid strict mode
-  await expect(page.getByText("Materials & finishes").first()).toBeVisible();
-  await expect(page.getByText("Furniture & equipment").first()).toBeVisible();
+  // Verify proposed approach has subsections - use .first() to avoid strict mode
+  await expect(page.getByText("Workstreams").first()).toBeVisible();
+  await expect(page.getByText("Delivery approach").first()).toBeVisible();
 });
 
 test("AI generation flow: estimate remains visible after proposal generation", async ({ page }) => {
@@ -363,7 +361,7 @@ test("AI detail page: loads proposal with AI-generated content sections", async 
   await page.goto("/proposals/ordx-1001");
 
   // Verify proposal title
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify executive summary is visible
   await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
@@ -371,21 +369,21 @@ test("AI detail page: loads proposal with AI-generated content sections", async 
   // Verify AI-generated project understanding is visible
   await expect(page.getByRole("heading", { name: "Project Understanding" })).toBeVisible();
 
-  // Verify AI-generated design direction is visible
-  await expect(page.getByRole("heading", { name: "Design Direction" })).toBeVisible();
+  // Verify AI-generated proposed approach is visible
+  await expect(page.getByRole("heading", { name: "Proposed Approach" })).toBeVisible();
 });
 
 test("AI detail page: AI content sections are distinct and complete", async ({ page }) => {
   await page.goto("/proposals/ordx-1001");
 
   // Wait for page to load
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify multiple AI content sections are visible
   await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Project Understanding" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Design Direction" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Spatial Planning" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Proposed Approach" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scope Recommendations" }).first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Budget Narrative" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Timeline Narrative" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Risks & Assumptions" })).toBeVisible();
@@ -396,7 +394,7 @@ test("AI detail page: deterministic estimate sections remain visible", async ({ 
   await page.goto("/proposals/ordx-1001");
 
   // Wait for page to load
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify deterministic budget estimate is visible
   await expect(page.getByRole("heading", { name: "Budget estimate" })).toBeVisible();
@@ -415,7 +413,7 @@ test("AI detail page: AI content complements estimate content", async ({ page })
   await page.goto("/proposals/ordx-1001");
 
   // Wait for page to load
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify AI-generated budget narrative exists alongside deterministic budget
   await expect(page.getByRole("heading", { name: "Budget Narrative" })).toBeVisible();
@@ -427,7 +425,7 @@ test("AI detail page: AI content complements estimate content", async ({ page })
 
   // Verify both AI and deterministic content are visible simultaneously
   await expect(page.getByText("Cost Breakdown")).toBeVisible();
-  await expect(page.getByText("Area impact")).toBeVisible();
+  await expect(page.getByText("Scope-size impact")).toBeVisible();
 });
 
 test("AI detail page: executive summary contains overview and value proposition", async ({ page }) => {
@@ -446,15 +444,15 @@ test("AI detail page: project details are displayed", async ({ page }) => {
   await page.goto("/proposals/ordx-1001");
 
   // Wait for page to load
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Verify project details card
-  await expect(page.getByRole("heading", { name: "Project details" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Engagement details" })).toBeVisible();
 
   // Verify project details fields are shown
   await expect(page.getByText("Created")).toBeVisible();
   await expect(page.getByText("Last updated")).toBeVisible();
-  await expect(page.getByText("Industry")).toBeVisible();
+  await expect(page.getByText("Industry:")).toBeVisible();
 });
 
 test("AI detail page: handles proposal with minimal options", async ({ page }) => {
@@ -462,11 +460,11 @@ test("AI detail page: handles proposal with minimal options", async ({ page }) =
   await page.goto("/proposals/ordx-1003");
 
   // Verify proposal loads with AI content
-  await expect(page.getByRole("heading", { name: "Branch Office Workspace Refresh" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Operational Improvement Engagement" })).toBeVisible();
 
   // Verify AI content still renders
   await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Design Direction" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Proposed Approach" })).toBeVisible();
 
   // Verify deterministic estimates are still shown
   await expect(page.getByRole("heading", { name: "Budget estimate" })).toBeVisible();
@@ -489,8 +487,8 @@ test("export route: displays client-facing sections", async ({ page }) => {
   // Verify key client-facing sections are visible - use .first() to avoid strict mode
   await expect(page.getByText("Executive Summary").first()).toBeVisible();
   await expect(page.getByText("Project Understanding").first()).toBeVisible();
-  await expect(page.getByText("Design Direction").first()).toBeVisible();
-  await expect(page.getByText("Spatial Planning").first()).toBeVisible();
+  await expect(page.getByText("Proposed Approach").first()).toBeVisible();
+  await expect(page.getByText("Scope Recommendations").first()).toBeVisible();
   await expect(page.getByText("Budget & Timeline").first()).toBeVisible();
 });
 
@@ -507,7 +505,7 @@ test("export route: includes proposal narrative content", async ({ page }) => {
   // Verify proposal narrative sections are present
   await expect(page.getByText("Strategic overview")).toBeVisible();
   await expect(page.getByText("Project context")).toBeVisible();
-  await expect(page.getByText("Recommended approach")).toBeVisible();
+  await expect(page.getByText("Recommended approach", { exact: true })).toBeVisible();
 });
 
 test("export route: includes estimate summary content", async ({ page }) => {
@@ -529,7 +527,7 @@ test("export access flow: from detail page to export view", async ({ page }) => 
   await page.goto("/proposals/ordx-1001");
 
   // Verify detail page loads
-  await expect(page.getByRole("heading", { name: "APAC Headquarters Office Fit-out" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Regional Transformation Initiative" })).toBeVisible();
 
   // Click the export button
   await page.getByRole("link", { name: "Export" }).click();
