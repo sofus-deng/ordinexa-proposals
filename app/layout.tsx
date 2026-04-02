@@ -14,20 +14,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ordinexa Proposals | Premium B2B Proposal Workspace",
+    default: "Ordinexa Proposals | Proposal Operations Platform",
     template: "%s | Ordinexa Proposals",
   },
-  description: "Create professional B2B proposals with AI-powered estimation, budget planning, and polished client deliverables. A premium workspace for modern agencies.",
+  description: "Create professional proposals with AI-powered estimation, budget planning, and polished deliverables.",
   openGraph: {
     type: "website",
     siteName: "Ordinexa Proposals",
-    title: "Ordinexa Proposals | Premium B2B Proposal Workspace",
-    description: "Create professional B2B proposals with AI-powered estimation, budget planning, and polished client deliverables. A premium workspace for modern agencies.",
+    title: "Ordinexa Proposals | Proposal Operations Platform",
+    description: "Create professional proposals with AI-powered estimation, budget planning, and polished deliverables.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ordinexa Proposals | Premium B2B Proposal Workspace",
-    description: "Create professional B2B proposals with AI-powered estimation, budget planning, and polished client deliverables. A premium workspace for modern agencies.",
+    title: "Ordinexa Proposals | Proposal Operations Platform",
+    description: "Create professional proposals with AI-powered estimation, budget planning, and polished deliverables.",
   },
 };
 

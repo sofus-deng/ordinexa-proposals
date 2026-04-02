@@ -77,7 +77,7 @@ export default async function DashboardPage() {
                 <ul className="space-y-3 leading-6">
                   <li>Create new proposals with project specifications and scope details.</li>
                   <li>Review estimates for budget and timeline.</li>
-                  <li>Export polished proposals for client presentation.</li>
+                  <li>Export polished proposals for presentation.</li>
                 </ul>
               </div>
             </div>

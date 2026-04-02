@@ -13,20 +13,20 @@ export default function HomePage() {
             Ordinexa Proposals
           </h1>
           <p className="text-[var(--text-lg)] leading-relaxed text-[var(--color-text-secondary)]">
-            Premium B2B proposal workspace with AI-powered estimation and polished client deliverables.
+            Proposal operations platform with AI-powered estimation and polished deliverables.
           </p>
         </div>
 
         {/* CTA Buttons */}
         <div className="mb-12 flex flex-wrap items-center justify-center gap-4">
           <ButtonLink href="/dashboard" variant="primary">
-            Open workspace demo
+            Open workspace
           </ButtonLink>
           <ButtonLink href="/proposals/ordx-1001" variant="secondary">
             View sample proposal
           </ButtonLink>
           <ButtonLink href="/proposals/ordx-1001/export" variant="secondary">
-            Export
+            Export preview
           </ButtonLink>
         </div>
 
@@ -65,7 +65,7 @@ export default function HomePage() {
 
         {/* Footer Note */}
         <p className="mt-12 text-center text-[var(--text-xs)] text-[var(--color-text-muted)]">
-          Demo workspace • Powered by Ordinexa
+          Proposal workspace • Powered by Ordinexa
         </p>
       </div>
     </div>
