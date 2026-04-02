@@ -29,17 +29,18 @@ function createTestEstimationInput(
   overrides: Partial<EstimationInputSnapshot> = {}
 ): EstimationInputSnapshot {
   return {
-    projectTypeId: "office-fit-out",
-    styleMultiplierId: "modern-corporate",
-    areaPing: 100,
-    meetingRoomCount: 3,
-    includeReceptionArea: false,
-    includePantry: false,
-    includeGlassPartitions: false,
-    includeCustomStorage: false,
-    includeSmartOfficeSetup: false,
-    includeMEPWork: false,
-    rushProject: false,
+    projectTypeId: "strategic-initiative",
+    styleMultiplierId: "standard-delivery",
+    scopeSize: 100,
+    complexityLevel: 3,
+    stakeholderCount: 3,
+    includeDiscoveryWorkshop: false,
+    includeTrainingEnablement: false,
+    includeImplementationSupport: false,
+    includeCustomDeliverables: false,
+    includeAutomationIntegration: false,
+    includeComplianceReview: false,
+    expeditedDelivery: false,
     ...overrides,
   };
 }
@@ -58,17 +59,18 @@ function createTestProposalInput(
     estimationInput: createTestEstimationInput(),
     estimationResult: {
       projectType: {
-        id: "office-fit-out",
-        name: "Office Fit-Out",
+        id: "strategic-initiative",
+        name: "Strategic Initiative",
       },
       styleOption: {
-        id: "modern-corporate",
-        name: "Modern Corporate",
+        id: "standard-delivery",
+        name: "Standard Delivery",
         multiplier: 1.0,
       },
       input: {
-        areaPing: 100,
-        meetingRoomCount: 3,
+        scopeSize: 100,
+        complexityLevel: 3,
+        stakeholderCount: 3,
         includedOptions: [],
       },
       budget: {
@@ -159,17 +161,17 @@ describe("Proposal Repository", () => {
           projectUnderstanding: {
             businessContext: "Test context",
             objectives: ["Objective 1"],
-            spatialRequirements: "Test requirements",
+            operationalNeeds: "Test requirements",
             constraints: ["Constraint 1"],
           },
-          designDirection: {
-            philosophy: "Test philosophy",
-            materialsFinishes: ["Material 1"],
-            colorPalette: "Test palette",
-            lightingApproach: "Test lighting",
-            furnitureEquipment: ["Furniture 1"],
+          proposedApproach: {
+            approachSummary: "Test approachSummary",
+            workstreams: ["Material 1"],
+            engagementModel: "Test palette",
+            deliveryApproach: "Test lighting",
+            capabilityEnablers: ["Furniture 1"],
           },
-          spatialPlanningRecommendations: {
+          scopeRecommendations: {
             overallStrategy: "Test strategy",
             areaRecommendations: [],
             circulationFlow: "Test flow",
@@ -566,7 +568,7 @@ describe("Proposal Repository", () => {
       const created = await repository.create(input);
 
       const newEstimationInput = createTestEstimationInput({
-        areaPing: 200,
+        scopeSize: 200,
       });
 
       const updated = await repository.update(created.id, {
@@ -575,7 +577,7 @@ describe("Proposal Repository", () => {
 
       assert.ok(updated, "Should return updated proposal");
       assert.strictEqual(
-        updated?.estimationInput.areaPing,
+        updated?.estimationInput.scopeSize,
         200,
         "Should update estimation input"
       );
@@ -596,17 +598,17 @@ describe("Proposal Repository", () => {
           projectUnderstanding: {
             businessContext: "Updated context",
             objectives: ["Updated objective"],
-            spatialRequirements: "Updated requirements",
+            operationalNeeds: "Updated requirements",
             constraints: ["Updated constraint"],
           },
-          designDirection: {
-            philosophy: "Updated philosophy",
-            materialsFinishes: ["Updated material"],
-            colorPalette: "Updated palette",
-            lightingApproach: "Updated lighting",
-            furnitureEquipment: ["Updated furniture"],
+          proposedApproach: {
+            approachSummary: "Updated approachSummary",
+            workstreams: ["Updated material"],
+            engagementModel: "Updated palette",
+            deliveryApproach: "Updated lighting",
+            capabilityEnablers: ["Updated furniture"],
           },
-          spatialPlanningRecommendations: {
+          scopeRecommendations: {
             overallStrategy: "Updated strategy",
             areaRecommendations: [],
             circulationFlow: "Updated flow",

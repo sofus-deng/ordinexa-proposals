@@ -38,46 +38,47 @@ import type { EstimationInput, BudgetRange, TimelineRange } from "@/lib/estimati
 
 // Standard test input
 const createTestInput = (overrides: Partial<EstimationInput> = {}): EstimationInput => ({
-  projectTypeId: "office-fit-out",
-  styleMultiplierId: "modern-corporate",
-  areaPing: 50,
-  meetingRoomCount: 2,
-  includeReceptionArea: false,
-  includePantry: false,
-  includeGlassPartitions: false,
-  includeCustomStorage: false,
-  includeSmartOfficeSetup: false,
-  includeMEPWork: false,
-  rushProject: false,
+  projectTypeId: "strategic-initiative",
+  styleMultiplierId: "standard-delivery",
+  scopeSize: 50,
+  complexityLevel: 3,
+  stakeholderCount: 2,
+  includeDiscoveryWorkshop: false,
+  includeTrainingEnablement: false,
+  includeImplementationSupport: false,
+  includeCustomDeliverables: false,
+  includeAutomationIntegration: false,
+  includeComplianceReview: false,
+  expeditedDelivery: false,
   ...overrides,
 });
 
 describe("Budget Calculation", () => {
   describe("calculateAreaFactor", () => {
-    it("should return 1.0 for baseline area (50 ping)", () => {
+    it("should return 1.0 for baseline scope size (50 ping)", () => {
       const factor = calculateAreaFactor(50);
       assert.strictEqual(factor, 1.0);
     });
 
-    it("should increase factor for larger areas", () => {
+    it("should increase factor for larger scope sizes", () => {
       const factor = calculateAreaFactor(100);
       assert.ok(factor > 1.0);
       assert.ok(factor <= 1.5); // Max factor
     });
 
-    it("should decrease factor for smaller areas", () => {
+    it("should decrease factor for smaller scope sizes", () => {
       const factor = calculateAreaFactor(20);
       assert.ok(factor < 1.0);
       assert.ok(factor >= 0.7); // Min factor
     });
 
-    it("should decrease factor for very small areas", () => {
+    it("should decrease factor for very small scope sizes", () => {
       const factor = calculateAreaFactor(1);
       assert.ok(factor < 0.8);
       assert.ok(factor >= 0.7); // Should be at or above minimum
     });
 
-    it("should clamp to maximum factor for very large areas", () => {
+    it("should clamp to maximum factor for very large scope sizes", () => {
       const factor = calculateAreaFactor(1000);
       assert.strictEqual(factor, 1.5);
     });
@@ -147,19 +148,19 @@ describe("Budget Calculation", () => {
 
     it("should return adjustments for selected options", () => {
       const input = createTestInput({
-        includeReceptionArea: true,
-        includePantry: true,
+        includeDiscoveryWorkshop: true,
+        includeTrainingEnablement: true,
       });
       const adjustments = getApplicableAdjustments(input);
       assert.strictEqual(adjustments.length, 2);
-      assert.ok(adjustments.some((a) => a.id === "reception-area"));
-      assert.ok(adjustments.some((a) => a.id === "pantry-facilities"));
+      assert.ok(adjustments.some((a) => a.id === "discovery-workshop"));
+      assert.ok(adjustments.some((a) => a.id === "training-enablement"));
     });
 
-    it("should include rush adjustment when rushProject is true", () => {
-      const input = createTestInput({ rushProject: true });
+    it("should include rush adjustment when expeditedDelivery is true", () => {
+      const input = createTestInput({ expeditedDelivery: true });
       const adjustments = getApplicableAdjustments(input);
-      assert.ok(adjustments.some((a) => a.id === "rush-project"));
+      assert.ok(adjustments.some((a) => a.id === "expedited-delivery"));
     });
   });
 
@@ -167,8 +168,8 @@ describe("Budget Calculation", () => {
     it("should calculate breakdown with all components", () => {
       const baseline: BudgetRange = { min: 85000, max: 180000 };
       const input = createTestInput({
-        includeReceptionArea: true,
-        styleMultiplierId: "premium-executive",
+        includeDiscoveryWorkshop: true,
+        styleMultiplierId: "advisory-led",
       });
       const breakdown = calculateBudgetBreakdown(baseline, 50, 1.18, input);
 
@@ -197,7 +198,7 @@ describe("Budget Calculation", () => {
 
 describe("Timeline Calculation", () => {
   describe("calculateMeetingRoomTimelineAddition", () => {
-    it("should add 0.5 weeks per meeting room", () => {
+    it("should add 0.5 weeks per stakeholder", () => {
       assert.strictEqual(calculateMeetingRoomTimelineAddition(0), 0);
       assert.strictEqual(calculateMeetingRoomTimelineAddition(1), 0.5);
       assert.strictEqual(calculateMeetingRoomTimelineAddition(4), 2);
@@ -213,8 +214,8 @@ describe("Timeline Calculation", () => {
 
     it("should return adjustments with timeline impacts", () => {
       const input = createTestInput({
-        includeReceptionArea: true,
-        includeMEPWork: true,
+        includeDiscoveryWorkshop: true,
+        includeComplianceReview: true,
       });
       const adjustments = getApplicableTimelineAdjustments(input);
       assert.strictEqual(adjustments.length, 2);
@@ -226,8 +227,8 @@ describe("Timeline Calculation", () => {
     it("should calculate breakdown with all components", () => {
       const baseline: TimelineRange = { minWeeks: 8, maxWeeks: 16 };
       const input = createTestInput({
-        includeReceptionArea: true,
-        meetingRoomCount: 2,
+        includeDiscoveryWorkshop: true,
+        stakeholderCount: 2,
       });
       const breakdown = calculateTimelineBreakdown(baseline, input);
 
@@ -238,9 +239,9 @@ describe("Timeline Calculation", () => {
       assert.strictEqual(breakdown.rushCompression, 1);
     });
 
-    it("should apply rush compression factor when rushProject is true", () => {
+    it("should apply rush compression factor when expeditedDelivery is true", () => {
       const baseline: TimelineRange = { minWeeks: 8, maxWeeks: 16 };
-      const input = createTestInput({ rushProject: true });
+      const input = createTestInput({ expeditedDelivery: true });
       const breakdown = calculateTimelineBreakdown(baseline, input);
 
       assert.strictEqual(breakdown.rushCompression, RUSH_COMPRESSION_FACTOR);
@@ -252,7 +253,7 @@ describe("Timeline Calculation", () => {
       const baseline: TimelineRange = { minWeeks: 8, maxWeeks: 16 };
       const input = createTestInput();
       const breakdown = calculateTimelineBreakdown(baseline, input);
-      const final = calculateFinalTimeline(breakdown, input.meetingRoomCount);
+      const final = calculateFinalTimeline(breakdown, input.stakeholderCount);
 
       assert.ok(final.minWeeks >= MINIMUM_TIMELINE_WEEKS);
       assert.ok(final.maxWeeks >= MINIMUM_TIMELINE_WEEKS);
@@ -269,13 +270,13 @@ describe("Timeline Calculation", () => {
       assert.strictEqual(final.maxWeeks, MINIMUM_TIMELINE_WEEKS);
     });
 
-    it("should add meeting room weeks to timeline", () => {
+    it("should add stakeholder weeks to timeline", () => {
       const baseline: TimelineRange = { minWeeks: 8, maxWeeks: 16 };
-      const input = createTestInput({ meetingRoomCount: 0 });
+      const input = createTestInput({ stakeholderCount: 0 });
       const breakdown = calculateTimelineBreakdown(baseline, input);
       const finalNoRooms = calculateFinalTimeline(breakdown, 0);
 
-      const inputWithRooms = createTestInput({ meetingRoomCount: 4 });
+      const inputWithRooms = createTestInput({ stakeholderCount: 4 });
       const breakdownWithRooms = calculateTimelineBreakdown(baseline, inputWithRooms);
       const finalWithRooms = calculateFinalTimeline(breakdownWithRooms, 4);
 
@@ -306,26 +307,26 @@ describe("Estimate Engine", () => {
       assert.ok(errors.some((e) => e.includes("Style option")));
     });
 
-    it("should require positive area", () => {
-      const input = createTestInput({ areaPing: 0 });
+    it("should require positive scope size", () => {
+      const input = createTestInput({ scopeSize: 0 });
       const errors = validateEstimationInput(input);
-      assert.ok(errors.some((e) => e.includes("Area")));
+      assert.ok(errors.some((e) => e.includes("Scope size")));
     });
 
-    it("should cap maximum area", () => {
-      const input = createTestInput({ areaPing: 15000 });
+    it("should cap maximum scope size", () => {
+      const input = createTestInput({ scopeSize: 15000 });
       const errors = validateEstimationInput(input);
-      assert.ok(errors.some((e) => e.includes("10,000 ping")));
+      assert.ok(errors.some((e) => e.includes("10,000 units")));
     });
 
-    it("should not allow negative meeting room count", () => {
-      const input = createTestInput({ meetingRoomCount: -1 });
+    it("should not allow negative stakeholder count", () => {
+      const input = createTestInput({ stakeholderCount: -1 });
       const errors = validateEstimationInput(input);
       assert.ok(errors.some((e) => e.includes("negative")));
     });
 
-    it("should cap maximum meeting room count", () => {
-      const input = createTestInput({ meetingRoomCount: 100 });
+    it("should cap maximum stakeholder count", () => {
+      const input = createTestInput({ stakeholderCount: 100 });
       const errors = validateEstimationInput(input);
       assert.ok(errors.some((e) => e.includes("50")));
     });
@@ -340,13 +341,13 @@ describe("Estimate Engine", () => {
 
     it("should return selected option names", () => {
       const input = createTestInput({
-        includeReceptionArea: true,
-        includePantry: true,
-        rushProject: true,
+        includeDiscoveryWorkshop: true,
+        includeTrainingEnablement: true,
+        expeditedDelivery: true,
       });
       const options = getIncludedOptionsList(input);
       assert.strictEqual(options.length, 3);
-      assert.ok(options.includes("Reception Area"));
+      assert.ok(options.includes("Discovery Workshop"));
       assert.ok(options.includes("Pantry"));
       assert.ok(options.includes("Rush Project"));
     });
@@ -380,24 +381,24 @@ describe("Estimate Engine", () => {
 
     it("should have correct summary shape", async () => {
       const input = createTestInput({
-        includeReceptionArea: true,
-        meetingRoomCount: 3,
+        includeDiscoveryWorkshop: true,
+        stakeholderCount: 3,
       });
       const result = await calculateEstimate(repository, input);
 
       assert.ok(result);
       // Project type
-      assert.strictEqual(result.projectType.id, "office-fit-out");
+      assert.strictEqual(result.projectType.id, "strategic-initiative");
       assert.strictEqual(typeof result.projectType.name, "string");
 
       // Style option
-      assert.strictEqual(result.styleOption.id, "modern-corporate");
+      assert.strictEqual(result.styleOption.id, "standard-delivery");
       assert.strictEqual(typeof result.styleOption.name, "string");
       assert.strictEqual(typeof result.styleOption.multiplier, "number");
 
       // Input
-      assert.strictEqual(result.input.areaPing, 50);
-      assert.strictEqual(result.input.meetingRoomCount, 3);
+      assert.strictEqual(result.input.scopeSize, 50);
+      assert.strictEqual(result.input.stakeholderCount, 3);
       assert.ok(Array.isArray(result.input.includedOptions));
 
       // Budget
@@ -419,8 +420,8 @@ describe("Estimate Engine", () => {
     });
 
     it("should calculate budget with style multiplier", async () => {
-      const inputModern = createTestInput({ styleMultiplierId: "modern-corporate" });
-      const inputPremium = createTestInput({ styleMultiplierId: "premium-executive" });
+      const inputModern = createTestInput({ styleMultiplierId: "standard-delivery" });
+      const inputPremium = createTestInput({ styleMultiplierId: "advisory-led" });
 
       const resultModern = await calculateEstimate(repository, inputModern);
       const resultPremium = await calculateEstimate(repository, inputPremium);
@@ -441,8 +442,8 @@ describe("Estimate Engine", () => {
     it("should calculate budget with adjustments", async () => {
       const inputNoOptions = createTestInput();
       const inputWithOptions = createTestInput({
-        includeReceptionArea: true,
-        includeMEPWork: true,
+        includeDiscoveryWorkshop: true,
+        includeComplianceReview: true,
       });
 
       const resultNoOptions = await calculateEstimate(repository, inputNoOptions);
@@ -460,8 +461,8 @@ describe("Estimate Engine", () => {
     it("should calculate timeline with adjustments", async () => {
       const inputNoOptions = createTestInput();
       const inputWithOptions = createTestInput({
-        includeReceptionArea: true,
-        includeMEPWork: true,
+        includeDiscoveryWorkshop: true,
+        includeComplianceReview: true,
       });
 
       const resultNoOptions = await calculateEstimate(repository, inputNoOptions);
@@ -478,7 +479,7 @@ describe("Estimate Engine", () => {
 
     it("should apply rush compression to timeline", async () => {
       const inputNormal = createTestInput();
-      const inputRush = createTestInput({ rushProject: true });
+      const inputRush = createTestInput({ expeditedDelivery: true });
 
       const resultNormal = await calculateEstimate(repository, inputNormal);
       const resultRush = await calculateEstimate(repository, inputRush);
@@ -500,8 +501,8 @@ describe("Estimate Engine", () => {
     });
 
     it("should handle different project types", async () => {
-      const officeFitOut = createTestInput({ projectTypeId: "office-fit-out" });
-      const receptionUpgrade = createTestInput({ projectTypeId: "reception-upgrade" });
+      const officeFitOut = createTestInput({ projectTypeId: "strategic-initiative" });
+      const receptionUpgrade = createTestInput({ projectTypeId: "targeted-enhancement" });
 
       const resultOffice = await calculateEstimate(repository, officeFitOut);
       const resultReception = await calculateEstimate(repository, receptionUpgrade);
@@ -522,9 +523,9 @@ describe("Integration: Full Estimation Flow", () => {
 
   it("should produce consistent results for same input", async () => {
     const input = createTestInput({
-      includeReceptionArea: true,
-      includePantry: true,
-      meetingRoomCount: 4,
+      includeDiscoveryWorkshop: true,
+      includeTrainingEnablement: true,
+      stakeholderCount: 4,
     });
 
     const result1 = await calculateEstimate(repository, input);
@@ -535,15 +536,15 @@ describe("Integration: Full Estimation Flow", () => {
 
   it("should handle all options enabled", async () => {
     const input = createTestInput({
-      includeReceptionArea: true,
-      includePantry: true,
-      includeGlassPartitions: true,
-      includeCustomStorage: true,
-      includeSmartOfficeSetup: true,
-      includeMEPWork: true,
-      rushProject: true,
-      meetingRoomCount: 10,
-      areaPing: 200,
+      includeDiscoveryWorkshop: true,
+      includeTrainingEnablement: true,
+      includeImplementationSupport: true,
+      includeCustomDeliverables: true,
+      includeAutomationIntegration: true,
+      includeComplianceReview: true,
+      expeditedDelivery: true,
+      stakeholderCount: 10,
+      scopeSize: 200,
     });
 
     const result = await calculateEstimate(repository, input);

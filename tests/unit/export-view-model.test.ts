@@ -21,17 +21,17 @@ describe("buildExportViewModel", () => {
     projectUnderstanding: {
       businessContext: "Test business context",
       objectives: ["Objective 1", "Objective 2"],
-      spatialRequirements: "Test spatial requirements",
+      operationalNeeds: "Test spatial requirements",
       constraints: ["Constraint 1", "Constraint 2"],
     },
-    designDirection: {
-      philosophy: "Test philosophy",
-      materialsFinishes: ["Material 1", "Material 2"],
-      colorPalette: "Test color palette",
-      lightingApproach: "Test lighting approach",
-      furnitureEquipment: ["Furniture 1", "Furniture 2"],
+    proposedApproach: {
+      approachSummary: "Test approachSummary",
+      workstreams: ["Material 1", "Material 2"],
+      engagementModel: "Test color palette",
+      deliveryApproach: "Test lighting approach",
+      capabilityEnablers: ["Furniture 1", "Furniture 2"],
     },
-    spatialPlanningRecommendations: {
+    scopeRecommendations: {
       overallStrategy: "Test overall strategy",
       areaRecommendations: [
         {
@@ -103,15 +103,16 @@ describe("buildExportViewModel", () => {
     estimationInput: {
       projectTypeId: "office-fit-out",
       styleMultiplierId: "modern-corporate",
-      areaPing: 100,
-      meetingRoomCount: 3,
-      includeReceptionArea: true,
-      includePantry: true,
-      includeGlassPartitions: false,
-      includeCustomStorage: true,
-      includeSmartOfficeSetup: false,
-      includeMEPWork: true,
-      rushProject: false,
+      scopeSize: 100,
+      complexityLevel: 3,
+      stakeholderCount: 3,
+      includeDiscoveryWorkshop: true,
+      includeTrainingEnablement: true,
+      includeImplementationSupport: false,
+      includeCustomDeliverables: true,
+      includeAutomationIntegration: false,
+      includeComplianceReview: true,
+      expeditedDelivery: false,
     },
     estimationResult: {
       projectType: {
@@ -124,8 +125,9 @@ describe("buildExportViewModel", () => {
         multiplier: 1.2,
       },
       input: {
-        areaPing: 100,
-        meetingRoomCount: 3,
+        scopeSize: 100,
+        complexityLevel: 3,
+        stakeholderCount: 3,
         includedOptions: ["Reception Area", "Pantry", "Custom Storage", "MEP Work"],
       },
       budget: {
@@ -192,7 +194,7 @@ describe("buildExportViewModel", () => {
     assert.equal(viewModel.metadata.clientName, "Test Client");
     assert.equal(viewModel.metadata.contactName, "John Doe");
     assert.equal(viewModel.metadata.industry, "Technology");
-    assert.equal(viewModel.metadata.status, "draft");
+    assert.equal(viewModel.metadata.status, "Draft");
     assert.equal(viewModel.metadata.summary, "Test summary");
     assert.deepEqual(viewModel.metadata.scope, ["Scope item 1", "Scope item 2"]);
     assert.equal(viewModel.metadata.createdAt, "2024-01-01T00:00:00Z");
@@ -200,15 +202,15 @@ describe("buildExportViewModel", () => {
     assert.equal(viewModel.metadata.dueDate, "2024-01-15T00:00:00Z");
     assert.equal(viewModel.metadata.projectTypeName, "Office Fit-Out");
     assert.equal(viewModel.metadata.styleOptionName, "Modern Corporate");
-    assert.equal(viewModel.metadata.areaPing, 100);
-    assert.equal(viewModel.metadata.meetingRoomCount, 3);
-    assert.equal(viewModel.metadata.includeReceptionArea, true);
-    assert.equal(viewModel.metadata.includePantry, true);
-    assert.equal(viewModel.metadata.includeGlassPartitions, false);
-    assert.equal(viewModel.metadata.includeCustomStorage, true);
-    assert.equal(viewModel.metadata.includeSmartOfficeSetup, false);
-    assert.equal(viewModel.metadata.includeMEPWork, true);
-    assert.equal(viewModel.metadata.rushProject, false);
+    assert.equal(viewModel.metadata.scopeSize, 100);
+    assert.equal(viewModel.metadata.stakeholderCount, 3);
+    assert.equal(viewModel.metadata.includeDiscoveryWorkshop, true);
+    assert.equal(viewModel.metadata.includeTrainingEnablement, true);
+    assert.equal(viewModel.metadata.includeImplementationSupport, false);
+    assert.equal(viewModel.metadata.includeCustomDeliverables, true);
+    assert.equal(viewModel.metadata.includeAutomationIntegration, false);
+    assert.equal(viewModel.metadata.includeComplianceReview, true);
+    assert.equal(viewModel.metadata.expeditedDelivery, false);
   });
 
   it("should correctly map estimation summary from proposal record", () => {
@@ -221,10 +223,10 @@ describe("buildExportViewModel", () => {
     assert.equal(viewModel.estimationSummary.timelineRange.maxWeeks, 12);
     assert.equal(viewModel.estimationSummary.confidenceLabel, "Medium"); // ~20% spread
     assert.deepEqual(viewModel.estimationSummary.includedOptions, [
-      "Reception Area",
-      "Pantry",
-      "Custom Storage",
-      "MEP Work",
+      "Discovery Workshop",
+      "Training & Enablement",
+      "Custom Deliverables",
+      "Compliance Review",
     ]);
   });
 

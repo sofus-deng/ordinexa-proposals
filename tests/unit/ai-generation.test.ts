@@ -33,18 +33,19 @@ const createTestInput = (
   overrides: Partial<ProposalGenerationInput> = {}
 ): ProposalGenerationInput => ({
   projectContext: {
-    title: "TechCorp Office Renovation",
+    title: "TechCorp Transformation Program",
     clientName: "TechCorp Inc.",
     contactName: "Jane Smith",
     industry: "Technology",
-    projectTypeName: "Office Fit-Out",
-    styleOptionName: "Modern Corporate",
-    scope: ["Complete office renovation", "New furniture", "AV installation"],
+    projectTypeName: "Strategic Initiative",
+    styleOptionName: "Standard Delivery",
+    scope: ["Cross-functional transformation engagement", "Enablement workstream", "Implementation coordination"],
   },
   estimationContext: {
-    areaPing: 100,
-    meetingRoomCount: 4,
-    includedOptions: ["Reception Area", "Pantry", "Glass Partitions"],
+    scopeSize: 100,
+    complexityLevel: 3,
+    stakeholderCount: 4,
+    includedOptions: ["Discovery Workshop", "Training & Enablement", "Implementation Support"],
     budgetRange: {
       min: 5000000,
       max: 8000000,
@@ -55,15 +56,15 @@ const createTestInput = (
       maxWeeks: 16,
     },
     styleMultiplier: 1.2,
-    isRushProject: false,
+    isExpeditedDelivery: false,
   },
-  fitOutOptions: {
-    includeReceptionArea: true,
-    includePantry: true,
-    includeGlassPartitions: true,
-    includeCustomStorage: false,
-    includeSmartOfficeSetup: false,
-    includeMEPWork: true,
+  serviceModules: {
+    includeDiscoveryWorkshop: true,
+    includeTrainingEnablement: true,
+    includeImplementationSupport: true,
+    includeCustomDeliverables: false,
+    includeAutomationIntegration: false,
+    includeComplianceReview: true,
   },
   ...overrides,
 });
@@ -84,11 +85,11 @@ describe("Prompt Builder", () => {
       const prompt = buildProposalPrompt(input);
 
       assert.ok(
-        prompt.systemPrompt.includes("interior fit-out"),
+        prompt.systemPrompt.includes("cross-industry"),
         "Should include domain expertise"
       );
       assert.ok(
-        prompt.systemPrompt.includes("Taiwan"),
+        prompt.systemPrompt.includes("stakeholder"),
         "Should include Taiwan context"
       );
     });
@@ -120,7 +121,7 @@ describe("Prompt Builder", () => {
         "Should include industry"
       );
       assert.ok(
-        prompt.userPrompt.includes("Office Fit-Out"),
+        prompt.userPrompt.includes("Strategic Initiative"),
         "Should include project type"
       );
     });
@@ -130,12 +131,12 @@ describe("Prompt Builder", () => {
       const prompt = buildProposalPrompt(input);
 
       assert.ok(
-        prompt.userPrompt.includes("100 ping"),
-        "Should include area"
+        prompt.userPrompt.includes("100 scope units"),
+        "Should include scope size"
       );
       assert.ok(
-        prompt.userPrompt.includes("4 rooms"),
-        "Should include meeting room count"
+        prompt.userPrompt.includes("4"),
+        "Should include stakeholder count"
       );
       // Currency format varies by locale (NT$, $, etc.) - check for numbers with commas
       assert.ok(
@@ -157,39 +158,39 @@ describe("Prompt Builder", () => {
       const prompt = buildProposalPrompt(input);
 
       assert.ok(
-        prompt.userPrompt.includes("Reception area"),
+        prompt.userPrompt.includes("Reception scope size"),
         "Should include reception option"
       );
       assert.ok(
-        prompt.userPrompt.includes("Pantry"),
+        prompt.userPrompt.includes("Training & Enablement"),
         "Should include pantry option"
       );
       assert.ok(
-        prompt.userPrompt.includes("Glass partition"),
+        prompt.userPrompt.includes("Implementation support"),
         "Should include glass partition option"
       );
     });
 
-    it("should mark rush projects in user prompt", () => {
+    it("should mark expedited deliverys in user prompt", () => {
       const input = createTestInput({
         estimationContext: {
           ...createTestInput().estimationContext,
-          isRushProject: true,
+          isExpeditedDelivery: true,
         },
       });
       const prompt = buildProposalPrompt(input);
 
       assert.ok(
-        prompt.userPrompt.includes("rush project"),
-        "Should mark as rush project"
+        prompt.userPrompt.includes("expedited delivery"),
+        "Should mark as expedited delivery"
       );
     });
 
     it("should include domain context when provided", () => {
       const input = createTestInput({
         domainContext: {
-          designPreferences: ["Sustainable materials", "Biophilic design"],
-          brandGuidelines: "Use company colors: blue and green",
+          deliveryPreferences: ["Sustainable materials", "Biophilic design"],
+          referenceGuidelines: "Use company colors: blue and green",
           specialRequirements: ["LEED certification target"],
         },
       });
@@ -228,9 +229,9 @@ describe("Prompt Builder", () => {
       const input = createTestInput();
       const prompt = buildProposalPrompt(input);
 
-      // 100 ping * 3.3 = 330 m²
+      // 100 scope units * 3.3 = scope units
       assert.ok(
-        prompt.userPrompt.includes("330 m²"),
+        prompt.userPrompt.includes("scope units"),
         "Should include square meter conversion"
       );
     });
@@ -255,8 +256,8 @@ describe("Prompt Builder", () => {
       const identifiers = extractProjectIdentifiers(input);
 
       assert.strictEqual(identifiers.clientName, "TechCorp Inc.");
-      assert.strictEqual(identifiers.projectType, "Office Fit-Out");
-      assert.strictEqual(identifiers.areaPing, 100);
+      assert.strictEqual(identifiers.projectType, "Strategic Initiative");
+      assert.strictEqual(identifiers.scopeSize, 100);
       assert.strictEqual(identifiers.budgetMin, 5000000);
       assert.strictEqual(identifiers.budgetMax, 8000000);
     });
@@ -275,17 +276,17 @@ describe("Schema Validation", () => {
         projectUnderstanding: {
           businessContext: "Test context",
           objectives: ["Objective 1", "Objective 2"],
-          spatialRequirements: "Test requirements",
+          operationalNeeds: "Test requirements",
           constraints: ["Constraint 1"],
         },
-        designDirection: {
-          philosophy: "Test philosophy",
-          materialsFinishes: ["Material 1"],
-          colorPalette: "Test palette",
-          lightingApproach: "Test lighting",
-          furnitureEquipment: ["Furniture 1"],
+        proposedApproach: {
+          approachSummary: "Test approachSummary",
+          workstreams: ["Material 1"],
+          engagementModel: "Test palette",
+          deliveryApproach: "Test lighting",
+          capabilityEnablers: ["Furniture 1"],
         },
-        spatialPlanningRecommendations: {
+        scopeRecommendations: {
           overallStrategy: "Test strategy",
           areaRecommendations: [
             {
@@ -407,17 +408,17 @@ describe("Schema Validation", () => {
         projectUnderstanding: {
           businessContext: "Test",
           objectives: ["Obj 1"],
-          spatialRequirements: "Test",
+          operationalNeeds: "Test",
           constraints: ["Con 1"],
         },
-        designDirection: {
-          philosophy: "Test",
-          materialsFinishes: ["Mat 1"],
-          colorPalette: "Test",
-          lightingApproach: "Test",
-          furnitureEquipment: ["Furn 1"],
+        proposedApproach: {
+          approachSummary: "Test",
+          workstreams: ["Mat 1"],
+          engagementModel: "Test",
+          deliveryApproach: "Test",
+          capabilityEnablers: ["Furn 1"],
         },
-        spatialPlanningRecommendations: {
+        scopeRecommendations: {
           overallStrategy: "Test",
           areaRecommendations: [
             { area: "Test", recommendation: "Test", rationale: "Test" },
@@ -490,17 +491,17 @@ describe("Schema Validation", () => {
         projectUnderstanding: {
           businessContext: "Test",
           objectives: ["Obj 1"],
-          spatialRequirements: "Test",
+          operationalNeeds: "Test",
           constraints: ["Con 1"],
         },
-        designDirection: {
-          philosophy: "Test",
-          materialsFinishes: ["Mat 1"],
-          colorPalette: "Test",
-          lightingApproach: "Test",
-          furnitureEquipment: ["Furn 1"],
+        proposedApproach: {
+          approachSummary: "Test",
+          workstreams: ["Mat 1"],
+          engagementModel: "Test",
+          deliveryApproach: "Test",
+          capabilityEnablers: ["Furn 1"],
         },
-        spatialPlanningRecommendations: {
+        scopeRecommendations: {
           overallStrategy: "Test",
           areaRecommendations: [
             { area: "Test", recommendation: "Test", rationale: "Test" },
@@ -618,7 +619,7 @@ describe("Mock Provider", () => {
 
       assert.ok(content.executiveSummary, "Should have executive summary");
       assert.ok(content.projectUnderstanding, "Should have project understanding");
-      assert.ok(content.designDirection, "Should have design direction");
+      assert.ok(content.proposedApproach, "Should have design direction");
       assert.ok(content.metadata, "Should have metadata");
       assert.strictEqual(content.metadata.provider, "mock");
     });
@@ -647,15 +648,15 @@ describe("Mock Provider", () => {
       );
     });
 
-    it("should include area-specific content", async () => {
+    it("should include scope size-specific content", async () => {
       const provider = new MockProvider({ latencyMs: 0 });
       const input = createTestInput();
       const content = await provider.generateProposalContent(input);
 
-      // Content should reference the area
+      // Content should reference the scope size
       assert.ok(
-        content.spatialPlanningRecommendations.overallStrategy.includes("100"),
-        "Should include area"
+        content.scopeRecommendations.overallStrategy.includes("100"),
+        "Should include scope size"
       );
     });
 
