@@ -158,8 +158,8 @@ describe("Prompt Builder", () => {
       const prompt = buildProposalPrompt(input);
 
       assert.ok(
-        prompt.userPrompt.includes("Reception scope size"),
-        "Should include reception option"
+        prompt.userPrompt.includes("Discovery workshop facilitation"),
+        "Should include discovery workshop option"
       );
       assert.ok(
         prompt.userPrompt.includes("Training & Enablement"),

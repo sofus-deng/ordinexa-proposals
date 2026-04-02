@@ -348,8 +348,8 @@ describe("Estimate Engine", () => {
       const options = getIncludedOptionsList(input);
       assert.strictEqual(options.length, 3);
       assert.ok(options.includes("Discovery Workshop"));
-      assert.ok(options.includes("Pantry"));
-      assert.ok(options.includes("Rush Project"));
+      assert.ok(options.includes("Training & Enablement"));
+      assert.ok(options.includes("Expedited Delivery"));
     });
   });
 

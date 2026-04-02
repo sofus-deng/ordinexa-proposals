@@ -200,8 +200,8 @@ describe("buildExportViewModel", () => {
     assert.equal(viewModel.metadata.createdAt, "2024-01-01T00:00:00Z");
     assert.equal(viewModel.metadata.updatedAt, "2024-01-02T00:00:00Z");
     assert.equal(viewModel.metadata.dueDate, "2024-01-15T00:00:00Z");
-    assert.equal(viewModel.metadata.projectTypeName, "Office Fit-Out");
-    assert.equal(viewModel.metadata.styleOptionName, "Modern Corporate");
+    assert.equal(viewModel.metadata.projectTypeName, "office-fit-out");
+    assert.equal(viewModel.metadata.styleOptionName, "modern-corporate");
     assert.equal(viewModel.metadata.scopeSize, 100);
     assert.equal(viewModel.metadata.stakeholderCount, 3);
     assert.equal(viewModel.metadata.includeDiscoveryWorkshop, true);
