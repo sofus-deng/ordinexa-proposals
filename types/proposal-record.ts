@@ -24,32 +24,35 @@ export interface EstimationInputSnapshot {
   /** Style multiplier identifier */
   styleMultiplierId: string;
 
-  /** Area in ping */
-  areaPing: number;
+  /** Relative scope size used for sizing-based estimate adjustments */
+  scopeSize: number;
 
-  /** Number of meeting rooms */
-  meetingRoomCount: number;
+  /** Delivery complexity on a 1-5 scale */
+  complexityLevel: number;
 
-  /** Whether to include reception area */
-  includeReceptionArea: boolean;
+  /** Number of primary stakeholders or coordination tracks */
+  stakeholderCount: number;
 
-  /** Whether to include pantry facilities */
-  includePantry: boolean;
+  /** Whether to include discovery workshop facilitation */
+  includeDiscoveryWorkshop: boolean;
 
-  /** Whether to include glass partitions */
-  includeGlassPartitions: boolean;
+  /** Whether to include training and enablement support */
+  includeTrainingEnablement: boolean;
 
-  /** Whether to include custom storage */
-  includeCustomStorage: boolean;
+  /** Whether to include implementation support */
+  includeImplementationSupport: boolean;
 
-  /** Whether to include smart office setup */
-  includeSmartOfficeSetup: boolean;
+  /** Whether to include custom deliverables */
+  includeCustomDeliverables: boolean;
 
-  /** Whether to include MEP work */
-  includeMEPWork: boolean;
+  /** Whether to include automation or systems integration */
+  includeAutomationIntegration: boolean;
 
-  /** Whether this is a rush project */
-  rushProject: boolean;
+  /** Whether to include compliance and governance review */
+  includeComplianceReview: boolean;
+
+  /** Whether this engagement requires accelerated delivery */
+  expeditedDelivery: boolean;
 }
 
 /**

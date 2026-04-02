@@ -21,14 +21,15 @@ export interface Proposal {
   dueDate: string;
   projectTypeId: string;
   styleOptionId: string;
-  areaPing: number;
-  meetingRoomCount: number;
-  includeReceptionArea: boolean;
-  includePantry: boolean;
-  includeGlassPartitions: boolean;
-  includeCustomStorage: boolean;
-  includeSmartOfficeSetup: boolean;
-  includeMEPWork: boolean;
-  rushProject: boolean;
+  scopeSize: number;
+  complexityLevel: number;
+  stakeholderCount: number;
+  includeDiscoveryWorkshop: boolean;
+  includeTrainingEnablement: boolean;
+  includeImplementationSupport: boolean;
+  includeCustomDeliverables: boolean;
+  includeAutomationIntegration: boolean;
+  includeComplianceReview: boolean;
+  expeditedDelivery: boolean;
   estimate: ProposalEstimateSummary;
 }

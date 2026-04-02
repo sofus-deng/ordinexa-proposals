@@ -23,26 +23,26 @@ export interface BuiltPrompt {
 }
 
 /**
- * Interior fit-out domain expertise for system prompt.
+ * Cross-industry proposal expertise for system prompt.
  */
-const INTERIOR_DESIGN_DOMAIN_EXPERTISE = `
-You are an expert interior fit-out consultant specializing in commercial and office spaces in Taiwan.
+const CROSS_INDUSTRY_PROPOSAL_EXPERTISE = `
+You are an expert proposal strategist supporting cross-industry customer engagements.
 Your expertise includes:
-- Space planning and workplace strategy
-- Material selection and specification
+- Discovery and stakeholder alignment
+- Scope framing and service design
 - Budget optimization and value engineering
 - Project timeline management
-- Building codes and regulations in Taiwan
-- Sustainable design practices
-- Modern workplace trends and employee experience
+- Governance and implementation readiness
+- Change enablement and operational adoption
+- Cross-functional coordination and delivery planning
 
 When generating proposal content:
 1. Be specific and actionable in recommendations
-2. Reference local Taiwan market conditions where relevant
-3. Consider the 1 ping ≈ 3.3 m² conversion for area calculations
-4. Balance aesthetics with functionality and budget
-5. Address client's industry-specific needs
-6. Provide clear rationale for design decisions
+2. Use neutral, professional language suitable across industries
+3. Treat scope size, complexity, and stakeholder count as estimation anchors
+4. Balance ambition with practicality and budget
+5. Address the customer's context without relying on sector-specific jargon
+6. Provide clear rationale for recommendations
 `;
 
 /**
@@ -60,26 +60,26 @@ You must respond with a valid JSON object matching this exact structure:
   "projectUnderstanding": {
     "businessContext": "string - understanding of client's business",
     "objectives": ["string - project objective 1", "string - project objective 2"],
-    "spatialRequirements": "string - understanding of space needs",
+    "operationalNeeds": "string - understanding of operational needs and engagement context",
     "constraints": ["string - identified constraint 1"]
   },
-  "designDirection": {
-    "philosophy": "string - overall design philosophy",
-    "materialsFinishes": ["string - material recommendation 1"],
-    "colorPalette": "string - color palette description",
-    "lightingApproach": "string - lighting design approach",
-    "furnitureEquipment": ["string - furniture recommendation 1"]
+  "proposedApproach": {
+    "approachSummary": "string - overall recommended approach",
+    "workstreams": ["string - recommended workstream 1"],
+    "engagementModel": "string - suggested engagement model",
+    "deliveryApproach": "string - recommended delivery approach",
+    "capabilityEnablers": ["string - capability enabler 1"]
   },
-  "spatialPlanningRecommendations": {
-    "overallStrategy": "string - overall spatial strategy",
+  "scopeRecommendations": {
+    "overallStrategy": "string - overall scope strategy",
     "areaRecommendations": [
       {
-        "area": "string - area/zone name",
+        "area": "string - workstream or focus area name",
         "recommendation": "string - specific recommendation",
         "rationale": "string - rationale for this recommendation"
       }
     ],
-    "circulationFlow": "string - circulation and flow considerations",
+    "circulationFlow": "string - coordination and sequencing considerations",
     "flexibilityConsiderations": "string - future flexibility notes"
   },
   "budgetNarrative": {
@@ -136,45 +136,42 @@ function formatCurrency(value: number, currency: string): string {
 }
 
 /**
- * Format area with both ping and square meters.
+ * Format scope size for prompt display.
  */
-function formatArea(areaPing: number): string {
-  const squareMeters = Math.round(areaPing * 3.3);
-  return `${areaPing} ping (${squareMeters} m²)`;
+function formatScopeSize(scopeSize: number): string {
+  return `${scopeSize} scope units`;
 }
 
 /**
- * Build fit-out options description.
+ * Build service modules description.
  */
-function buildFitOutOptionsDescription(
-  options: ProposalGenerationInput["fitOutOptions"]
+function buildServiceModulesDescription(
+  options: ProposalGenerationInput["serviceModules"]
 ): string {
   const selectedOptions: string[] = [];
 
-  if (options.includeReceptionArea) {
-    selectedOptions.push("Reception area design and build");
+  if (options.includeDiscoveryWorkshop) {
+    selectedOptions.push("Discovery workshop facilitation");
   }
-  if (options.includePantry) {
-    selectedOptions.push("Pantry/tea point facilities");
+  if (options.includeTrainingEnablement) {
+    selectedOptions.push("Training and enablement support");
   }
-  if (options.includeGlassPartitions) {
-    selectedOptions.push("Glass partition systems");
+  if (options.includeImplementationSupport) {
+    selectedOptions.push("Implementation support and rollout assistance");
   }
-  if (options.includeCustomStorage) {
-    selectedOptions.push("Custom storage solutions");
+  if (options.includeCustomDeliverables) {
+    selectedOptions.push("Custom deliverables for unique stakeholder needs");
   }
-  if (options.includeSmartOfficeSetup) {
-    selectedOptions.push("Smart office technology integration");
+  if (options.includeAutomationIntegration) {
+    selectedOptions.push("Automation and systems integration");
   }
-  if (options.includeMEPWork) {
-    selectedOptions.push(
-      "MEP (Mechanical, Electrical, Plumbing) engineering works"
-    );
+  if (options.includeComplianceReview) {
+    selectedOptions.push("Compliance and governance review");
   }
 
   return selectedOptions.length > 0
     ? selectedOptions.map((opt) => `- ${opt}`).join("\n")
-    : "- Standard fit-out scope only";
+    : "- Core engagement scope only";
 }
 
 /**
@@ -200,19 +197,22 @@ function buildUserPrompt(input: ProposalGenerationInput): string {
   });
   sections.push("");
 
-  // Space Requirements Section
-  sections.push("## SPACE REQUIREMENTS");
+  // Estimation Anchors Section
+  sections.push("## ESTIMATION ANCHORS");
   sections.push(
-    `**Total Area:** ${formatArea(input.estimationContext.areaPing)}`
+    `**Scope Size:** ${formatScopeSize(input.estimationContext.scopeSize)}`
   );
   sections.push(
-    `**Meeting Rooms:** ${input.estimationContext.meetingRoomCount} rooms`
+    `**Complexity Level:** ${input.estimationContext.complexityLevel} / 5`
+  );
+  sections.push(
+    `**Stakeholder Count:** ${input.estimationContext.stakeholderCount}`
   );
   sections.push("");
 
-  // Fit-out Options Section
-  sections.push("## SELECTED FIT-OUT OPTIONS");
-  sections.push(buildFitOutOptionsDescription(input.fitOutOptions));
+  // Service Modules Section
+  sections.push("## SELECTED SERVICE MODULES");
+  sections.push(buildServiceModulesDescription(input.serviceModules));
   sections.push("");
 
   // Budget Context Section (pre-calculated, not computed by AI)
@@ -224,8 +224,8 @@ function buildUserPrompt(input: ProposalGenerationInput): string {
   sections.push(
     `**Style Multiplier Applied:** ${input.estimationContext.styleMultiplier}x`
   );
-  if (input.estimationContext.isRushProject) {
-    sections.push("**Note:** This is a rush project with compressed timeline");
+  if (input.estimationContext.isExpeditedDelivery) {
+    sections.push("**Note:** This engagement requires expedited delivery with compressed timeline");
   }
   sections.push("");
 
@@ -235,8 +235,8 @@ function buildUserPrompt(input: ProposalGenerationInput): string {
   sections.push(
     `**Estimated Duration:** ${timeline.minWeeks} - ${timeline.maxWeeks} weeks`
   );
-  if (input.estimationContext.isRushProject) {
-    sections.push("**Note:** Timeline has been compressed due to rush status");
+  if (input.estimationContext.isExpeditedDelivery) {
+    sections.push("**Note:** Timeline has been compressed due to expedited delivery requirements");
   }
   sections.push("");
 
@@ -254,18 +254,18 @@ function buildUserPrompt(input: ProposalGenerationInput): string {
     sections.push("## ADDITIONAL CONTEXT");
 
     if (
-      input.domainContext.designPreferences &&
-      input.domainContext.designPreferences.length > 0
+      input.domainContext.deliveryPreferences &&
+      input.domainContext.deliveryPreferences.length > 0
     ) {
-      sections.push("### Design Preferences");
-      input.domainContext.designPreferences.forEach((pref) => {
+      sections.push("### Delivery Preferences");
+      input.domainContext.deliveryPreferences.forEach((pref: string) => {
         sections.push(`- ${pref}`);
       });
     }
 
-    if (input.domainContext.brandGuidelines) {
-      sections.push("### Brand Guidelines");
-      sections.push(input.domainContext.brandGuidelines);
+    if (input.domainContext.referenceGuidelines) {
+      sections.push("### Reference Guidelines");
+      sections.push(input.domainContext.referenceGuidelines);
     }
 
     if (
@@ -283,7 +283,7 @@ function buildUserPrompt(input: ProposalGenerationInput): string {
   // Generation Request
   sections.push("## GENERATION REQUEST");
   sections.push(
-    "Based on the above project context, generate a comprehensive interior fit-out proposal following the structured output format. Ensure all recommendations are specific to this project and client."
+    "Based on the above project context, generate a comprehensive cross-industry proposal following the structured output format. Ensure all recommendations are specific to this project and client."
   );
 
   return sections.join("\n");
@@ -306,7 +306,7 @@ function estimateTokenCount(text: string): number {
 export function buildProposalPrompt(
   input: ProposalGenerationInput
 ): BuiltPrompt {
-  const systemPrompt = `${INTERIOR_DESIGN_DOMAIN_EXPERTISE}
+  const systemPrompt = `${CROSS_INDUSTRY_PROPOSAL_EXPERTISE}
 
 ${OUTPUT_FORMAT_INSTRUCTIONS}`;
 
@@ -329,7 +329,7 @@ ${OUTPUT_FORMAT_INSTRUCTIONS}`;
 export function buildMinimalPrompt(
   input: ProposalGenerationInput
 ): BuiltPrompt {
-  const systemPrompt = `You are an interior fit-out proposal generator.
+  const systemPrompt = `You are a cross-industry proposal generator.
 Generate proposal content in the specified JSON format based on the project context provided.
 ${OUTPUT_FORMAT_INSTRUCTIONS}`;
 
@@ -352,7 +352,7 @@ export function extractProjectIdentifiers(
   return {
     clientName: input.projectContext.clientName,
     projectType: input.projectContext.projectTypeName,
-    areaPing: input.estimationContext.areaPing,
+    scopeSize: input.estimationContext.scopeSize,
     budgetMin: input.estimationContext.budgetRange.min,
     budgetMax: input.estimationContext.budgetRange.max,
   };

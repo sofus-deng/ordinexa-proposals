@@ -13,19 +13,20 @@ const STATUS_LABELS: Record<string, string> = {
  * Client-facing label mappings for internal project type values
  */
 const PROJECT_TYPE_LABELS: Record<string, string> = {
-  "office-fit-out": "Office Fit-Out",
-  "commercial-showroom": "Commercial Showroom",
-  "workspace-refresh": "Workspace Refresh",
-  "reception-upgrade": "Reception Upgrade",
+  "strategic-initiative": "Strategic Initiative",
+  "service-modernization": "Service Modernization",
+  "customer-experience-program": "Customer Experience Program",
+  "targeted-enhancement": "Targeted Enhancement",
+  "continuous-improvement-engagement": "Continuous Improvement Engagement",
 };
 
 /**
  * Client-facing label mappings for internal style option values
  */
 const STYLE_LABELS: Record<string, string> = {
-  "premium-executive": "Premium Executive",
-  "modern-corporate": "Modern Corporate",
-  "industrial-minimal": "Industrial Minimal",
+  "advisory-led": "Advisory-Led",
+  "standard-delivery": "Standard Delivery",
+  "lean-delivery": "Lean Delivery",
 };
 
 /**

@@ -156,17 +156,18 @@ function SaveSuccessState({
  * Default form state for estimation inputs
  */
 const defaultFormData: EstimationInput = {
-  projectTypeId: "office-fit-out",
-  styleMultiplierId: "modern-corporate",
-  areaPing: 100,
-  meetingRoomCount: 3,
-  includeReceptionArea: false,
-  includePantry: false,
-  includeGlassPartitions: false,
-  includeCustomStorage: false,
-  includeSmartOfficeSetup: false,
-  includeMEPWork: false,
-  rushProject: false,
+  projectTypeId: "strategic-initiative",
+  styleMultiplierId: "standard-delivery",
+  scopeSize: 100,
+  complexityLevel: 3,
+  stakeholderCount: 4,
+  includeDiscoveryWorkshop: false,
+  includeTrainingEnablement: false,
+  includeImplementationSupport: false,
+  includeCustomDeliverables: false,
+  includeAutomationIntegration: false,
+  includeComplianceReview: false,
+  expeditedDelivery: false,
 };
 
 type ProviderOption = AIGenerationConfig["provider"];
@@ -186,13 +187,13 @@ const providerOptions: Array<{ value: ProviderOption; label: string; description
 
 function getSelectedScopeLabels(input: EstimationInput): string[] {
   return [
-    input.includeReceptionArea ? "Reception area" : null,
-    input.includePantry ? "Pantry facilities" : null,
-    input.includeGlassPartitions ? "Glass partitions" : null,
-    input.includeCustomStorage ? "Custom storage" : null,
-    input.includeSmartOfficeSetup ? "Smart office setup" : null,
-    input.includeMEPWork ? "MEP work" : null,
-    input.rushProject ? "Rush project delivery" : null,
+    input.includeDiscoveryWorkshop ? "Discovery workshop" : null,
+    input.includeTrainingEnablement ? "Training and enablement" : null,
+    input.includeImplementationSupport ? "Implementation support" : null,
+    input.includeCustomDeliverables ? "Custom deliverables" : null,
+    input.includeAutomationIntegration ? "Automation integration" : null,
+    input.includeComplianceReview ? "Compliance review" : null,
+    input.expeditedDelivery ? "Expedited delivery" : null,
   ].filter((value): value is string => Boolean(value));
 }
 
@@ -207,18 +208,19 @@ function buildProposalGenerationInput(
       title: `${estimate.projectType.name} Proposal`,
       clientName: "Prospective Client",
       contactName: "Project Lead",
-      industry: "Commercial Workplace",
+      industry: "Cross-Industry",
       projectTypeName: estimate.projectType.name,
       styleOptionName: estimate.styleOption.name,
       scope: [
-        `${estimate.projectType.name} for ${estimate.input.areaPing} ping`,
-        `${estimate.input.meetingRoomCount} meeting room${estimate.input.meetingRoomCount === 1 ? "" : "s"}`,
+        `${estimate.projectType.name} engagement sized at ${estimate.input.scopeSize} units`,
+        `Complexity level ${estimate.input.complexityLevel} with ${estimate.input.stakeholderCount} stakeholder track${estimate.input.stakeholderCount === 1 ? "" : "s"}`,
         ...selectedScope,
       ],
     },
     estimationContext: {
-      areaPing: estimate.input.areaPing,
-      meetingRoomCount: estimate.input.meetingRoomCount,
+      scopeSize: estimate.input.scopeSize,
+      complexityLevel: estimate.input.complexityLevel,
+      stakeholderCount: estimate.input.stakeholderCount,
       includedOptions: estimate.input.includedOptions,
       budgetRange: {
         min: estimate.budget.final.min,
@@ -230,18 +232,18 @@ function buildProposalGenerationInput(
         maxWeeks: estimate.timeline.final.maxWeeks,
       },
       styleMultiplier: estimate.styleOption.multiplier,
-      isRushProject: formData.rushProject,
+      isExpeditedDelivery: formData.expeditedDelivery,
     },
-    fitOutOptions: {
-      includeReceptionArea: formData.includeReceptionArea,
-      includePantry: formData.includePantry,
-      includeGlassPartitions: formData.includeGlassPartitions,
-      includeCustomStorage: formData.includeCustomStorage,
-      includeSmartOfficeSetup: formData.includeSmartOfficeSetup,
-      includeMEPWork: formData.includeMEPWork,
+    serviceModules: {
+      includeDiscoveryWorkshop: formData.includeDiscoveryWorkshop,
+      includeTrainingEnablement: formData.includeTrainingEnablement,
+      includeImplementationSupport: formData.includeImplementationSupport,
+      includeCustomDeliverables: formData.includeCustomDeliverables,
+      includeAutomationIntegration: formData.includeAutomationIntegration,
+      includeComplianceReview: formData.includeComplianceReview,
     },
     domainContext: {
-      designPreferences: [estimate.styleOption.name, estimate.projectType.name],
+      deliveryPreferences: [estimate.styleOption.name, estimate.projectType.name],
       specialRequirements: selectedScope,
     },
   };
@@ -370,49 +372,49 @@ function ProposalPreview({ content }: { content: GeneratedProposalContent }) {
               <PreviewList items={content.projectUnderstanding.constraints} />
             </div>
           </div>
-          <p>{content.projectUnderstanding.spatialRequirements}</p>
+          <p>{content.projectUnderstanding.operationalNeeds}</p>
         </AccordionItem>
 
         <AccordionItem
-          id="design-direction"
-          title="Design direction"
+          id="proposed-approach"
+          title="Proposed approach"
           defaultOpen={false}
         >
-          <p>{content.designDirection.philosophy}</p>
+          <p>{content.proposedApproach.approachSummary}</p>
           <div className="space-y-4">
             <div>
               <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                Materials & finishes
+                Workstreams
               </p>
-              <PreviewList items={content.designDirection.materialsFinishes} />
+              <PreviewList items={content.proposedApproach.workstreams} />
             </div>
             <div>
               <p className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                Furniture & equipment
+                Capability enablers
               </p>
-              <PreviewList items={content.designDirection.furnitureEquipment} />
+              <PreviewList items={content.proposedApproach.capabilityEnablers} />
             </div>
           </div>
-          <p><span className="font-semibold">Color palette:</span> {content.designDirection.colorPalette}</p>
-          <p><span className="font-semibold">Lighting approach:</span> {content.designDirection.lightingApproach}</p>
+          <p><span className="font-semibold">Engagement model:</span> {content.proposedApproach.engagementModel}</p>
+          <p><span className="font-semibold">Delivery approach:</span> {content.proposedApproach.deliveryApproach}</p>
         </AccordionItem>
 
         <AccordionItem
-          id="spatial-planning"
-          title="Spatial planning recommendations"
+          id="scope-recommendations"
+          title="Scope recommendations"
           defaultOpen={false}
         >
-          <p>{content.spatialPlanningRecommendations.overallStrategy}</p>
+          <p>{content.scopeRecommendations.overallStrategy}</p>
           <div className="space-y-3">
-            {content.spatialPlanningRecommendations.areaRecommendations.map((recommendation) => (
+            {content.scopeRecommendations.areaRecommendations.map((recommendation) => (
               <RecommendationCard
                 key={`${recommendation.area}-${recommendation.recommendation}`}
                 recommendation={recommendation}
               />
             ))}
           </div>
-          <p><span className="font-semibold">Circulation flow:</span> {content.spatialPlanningRecommendations.circulationFlow}</p>
-          <p><span className="font-semibold">Flexibility:</span> {content.spatialPlanningRecommendations.flexibilityConsiderations}</p>
+          <p><span className="font-semibold">Coordination approach:</span> {content.scopeRecommendations.circulationFlow}</p>
+          <p><span className="font-semibold">Flexibility:</span> {content.scopeRecommendations.flexibilityConsiderations}</p>
         </AccordionItem>
 
         <AccordionItem
@@ -781,7 +783,7 @@ export default function NewProposalPage() {
                       ))}
                     </Select>
                   </FieldWrapper>
-                  <FieldWrapper label="Interior style" required>
+                  <FieldWrapper label="Delivery model" required>
                     <Select
                       value={formData.styleMultiplierId}
                       onChange={(e) => updateField("styleMultiplierId", e.target.value)}
@@ -793,36 +795,45 @@ export default function NewProposalPage() {
                       ))}
                     </Select>
                   </FieldWrapper>
-                  <FieldWrapper label="Area (ping)" required>
+                  <FieldWrapper label="Scope size" required>
                     <Input
                       type="number"
                       min={1}
                       max={10000}
-                      value={formData.areaPing}
-                      onChange={(e) => updateField("areaPing", Number(e.target.value))}
+                      value={formData.scopeSize}
+                      onChange={(e) => updateField("scopeSize", Number(e.target.value))}
                     />
                   </FieldWrapper>
-                  <FieldWrapper label="Meeting rooms" required>
+                  <FieldWrapper label="Complexity level" required>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={formData.complexityLevel}
+                      onChange={(e) => updateField("complexityLevel", Number(e.target.value))}
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Stakeholder count" required>
                     <Input
                       type="number"
                       min={0}
                       max={50}
-                      value={formData.meetingRoomCount}
-                      onChange={(e) => updateField("meetingRoomCount", Number(e.target.value))}
+                      value={formData.stakeholderCount}
+                      onChange={(e) => updateField("stakeholderCount", Number(e.target.value))}
                     />
                   </FieldWrapper>
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="Additional scope" description="Optional features that enhance the project scope.">
+              <SectionBlock title="Additional scope" description="Optional service modules that enhance the proposal scope.">
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
-                    { key: "includeReceptionArea" as const, label: "Reception area", desc: "Front-of-house welcome zone" },
-                    { key: "includePantry" as const, label: "Pantry facilities", desc: "Break room and kitchenette" },
-                    { key: "includeGlassPartitions" as const, label: "Glass partitions", desc: "Glazed room dividers" },
-                    { key: "includeCustomStorage" as const, label: "Custom storage", desc: "Built-in cabinetry" },
-                    { key: "includeSmartOfficeSetup" as const, label: "Smart office", desc: "IoT and automation systems" },
-                    { key: "includeMEPWork" as const, label: "MEP work", desc: "Mechanical, electrical, plumbing" },
+                    { key: "includeDiscoveryWorkshop" as const, label: "Discovery workshop", desc: "Structured stakeholder discovery and alignment" },
+                    { key: "includeTrainingEnablement" as const, label: "Training and enablement", desc: "Change support and knowledge transfer" },
+                    { key: "includeImplementationSupport" as const, label: "Implementation support", desc: "Execution oversight and rollout assistance" },
+                    { key: "includeCustomDeliverables" as const, label: "Custom deliverables", desc: "Tailored outputs for unique requirements" },
+                    { key: "includeAutomationIntegration" as const, label: "Automation integration", desc: "Systems, tooling, or workflow integration" },
+                    { key: "includeComplianceReview" as const, label: "Compliance review", desc: "Governance, policy, or readiness review" },
                   ].map(({ key, label, desc }) => (
                     <button
                       key={key}
@@ -856,32 +867,32 @@ export default function NewProposalPage() {
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="Timeline" description="Project delivery requirements.">
+              <SectionBlock title="Timeline" description="Delivery timing requirements.">
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => toggleBoolean("rushProject")}
+                    onClick={() => toggleBoolean("expeditedDelivery")}
                     className={`flex items-center gap-3 rounded-[var(--radius-lg)] border p-4 text-left transition-all ${
-                      formData.rushProject
+                      formData.expeditedDelivery
                         ? "border-amber-500 bg-amber-50"
                         : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-hover)]"
                     }`}
                   >
                     <div
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border ${
-                        formData.rushProject
+                        formData.expeditedDelivery
                           ? "border-amber-500 bg-amber-500 text-white"
                           : "border-[var(--color-border)]"
                       }`}
                     >
-                      {formData.rushProject && (
+                      {formData.expeditedDelivery && (
                         <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </div>
                     <div>
-                      <p className="text-[var(--text-sm)] font-medium text-[var(--color-text-primary)]">Rush project</p>
+                      <p className="text-[var(--text-sm)] font-medium text-[var(--color-text-primary)]">Expedited delivery</p>
                       <p className="text-[var(--text-xs)] text-[var(--color-text-secondary)]">Compressed timeline with premium pricing</p>
                     </div>
                   </button>
@@ -1098,12 +1109,16 @@ export default function NewProposalPage() {
                         <span className="font-medium text-[var(--color-text-primary)]">{estimate.styleOption.name}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[var(--color-text-secondary)]">Area</span>
-                        <span className="font-medium text-[var(--color-text-primary)]">{estimate.input.areaPing} ping</span>
+                        <span className="text-[var(--color-text-secondary)]">Scope size</span>
+                        <span className="font-medium text-[var(--color-text-primary)]">{estimate.input.scopeSize}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[var(--color-text-secondary)]">Meeting rooms</span>
-                        <span className="font-medium text-[var(--color-text-primary)]">{estimate.input.meetingRoomCount}</span>
+                        <span className="text-[var(--color-text-secondary)]">Complexity level</span>
+                        <span className="font-medium text-[var(--color-text-primary)]">{estimate.input.complexityLevel}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--color-text-secondary)]">Stakeholders</span>
+                        <span className="font-medium text-[var(--color-text-primary)]">{estimate.input.stakeholderCount}</span>
                       </div>
                     </div>
                   </div>
@@ -1125,7 +1140,7 @@ export default function NewProposalPage() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[var(--color-text-secondary)]">Area impact</span>
+                        <span className="text-[var(--color-text-secondary)]">Scope-size impact</span>
                         <span className={`font-medium ${estimate.budget.areaImpact >= 0 ? "text-amber-600" : "text-green-600"}`}>
                           {formatPercentage(estimate.budget.areaImpact)}
                         </span>
@@ -1176,7 +1191,7 @@ export default function NewProposalPage() {
                       )}
                       {estimate.timeline.rushCompression > 0 && (
                         <div className="flex justify-between">
-                          <span className="text-[var(--color-text-secondary)]">Rush compression</span>
+                          <span className="text-[var(--color-text-secondary)]">Expedited compression</span>
                           <span className="font-medium text-green-600">
                             -{Math.round(estimate.timeline.rushCompression * 100)}%
                           </span>
@@ -1207,19 +1222,19 @@ export default function NewProposalPage() {
               ) : (
               <div className="space-y-5 text-[var(--text-sm)] text-[var(--color-text-secondary)]">
                 <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface-muted)] p-5">
-                  <p className="font-medium text-[var(--color-text-primary)]">Configure your project to generate an estimate</p>
-                    <p className="mt-2 leading-relaxed">Select project type, style, area, and any additional scope options to calculate budget and timeline.</p>
+                  <p className="font-medium text-[var(--color-text-primary)]">Configure your engagement to generate an estimate</p>
+                    <p className="mt-2 leading-relaxed">Select proposal type, delivery model, scope size, and optional service modules to calculate budget and timeline.</p>
                   </div>
                   <div className="space-y-3">
                     <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">Quick guide</p>
                     <ul className="space-y-3">
                       <li className="flex gap-3 leading-6">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                        <span>Choose project type and interior style.</span>
+                        <span>Choose proposal type and delivery model.</span>
                       </li>
                       <li className="flex gap-3 leading-6">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                        <span>Enter the total area in ping.</span>
+                        <span>Enter scope size, complexity, and stakeholder count.</span>
                       </li>
                       <li className="flex gap-3 leading-6">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
@@ -1283,7 +1298,7 @@ export default function NewProposalPage() {
                       </li>
                       <li className="flex gap-3 leading-6">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                        <span>Design direction and spatial planning</span>
+                        <span>Proposed approach and scope recommendations</span>
                       </li>
                       <li className="flex gap-3 leading-6">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
@@ -1316,7 +1331,7 @@ export default function NewProposalPage() {
                     </li>
                     <li className="flex gap-3 leading-6">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                      <span>Style selection adjusts finish level pricing.</span>
+                        <span>Delivery model adjusts engagement intensity pricing.</span>
                     </li>
                     <li className="flex gap-3 leading-6">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />

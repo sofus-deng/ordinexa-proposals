@@ -22,26 +22,26 @@ import { calculateTimeline } from "./timeline";
 export function getIncludedOptionsList(input: EstimationInput): string[] {
   const options: string[] = [];
 
-  if (input.includeReceptionArea) {
-    options.push("Reception Area");
+  if (input.includeDiscoveryWorkshop) {
+    options.push("Discovery Workshop");
   }
-  if (input.includePantry) {
-    options.push("Pantry");
+  if (input.includeTrainingEnablement) {
+    options.push("Training & Enablement");
   }
-  if (input.includeGlassPartitions) {
-    options.push("Glass Partitions");
+  if (input.includeImplementationSupport) {
+    options.push("Implementation Support");
   }
-  if (input.includeCustomStorage) {
-    options.push("Custom Storage");
+  if (input.includeCustomDeliverables) {
+    options.push("Custom Deliverables");
   }
-  if (input.includeSmartOfficeSetup) {
-    options.push("Smart Office Setup");
+  if (input.includeAutomationIntegration) {
+    options.push("Automation Integration");
   }
-  if (input.includeMEPWork) {
-    options.push("MEP Work");
+  if (input.includeComplianceReview) {
+    options.push("Compliance Review");
   }
-  if (input.rushProject) {
-    options.push("Rush Project");
+  if (input.expeditedDelivery) {
+    options.push("Expedited Delivery");
   }
 
   return options;
@@ -96,8 +96,9 @@ export async function calculateEstimate(
       multiplier: styleOption.multiplier,
     },
     input: {
-      areaPing: input.areaPing,
-      meetingRoomCount: input.meetingRoomCount,
+      scopeSize: input.scopeSize,
+      complexityLevel: input.complexityLevel,
+      stakeholderCount: input.stakeholderCount,
       includedOptions: getIncludedOptionsList(input),
     },
     budget: {
@@ -139,20 +140,24 @@ export function validateEstimationInput(input: EstimationInput): string[] {
     errors.push("Style option is required");
   }
 
-  if (input.areaPing <= 0) {
-    errors.push("Area must be greater than 0");
+  if (input.scopeSize <= 0) {
+    errors.push("Scope size must be greater than 0");
   }
 
-  if (input.areaPing > 10000) {
-    errors.push("Area cannot exceed 10,000 ping");
+  if (input.scopeSize > 10000) {
+    errors.push("Scope size cannot exceed 10,000 units");
   }
 
-  if (input.meetingRoomCount < 0) {
-    errors.push("Meeting room count cannot be negative");
+  if (input.complexityLevel < 1 || input.complexityLevel > 5) {
+    errors.push("Complexity level must be between 1 and 5");
   }
 
-  if (input.meetingRoomCount > 50) {
-    errors.push("Meeting room count cannot exceed 50");
+  if (input.stakeholderCount < 0) {
+    errors.push("Stakeholder count cannot be negative");
+  }
+
+  if (input.stakeholderCount > 50) {
+    errors.push("Stakeholder count cannot exceed 50");
   }
 
   return errors;

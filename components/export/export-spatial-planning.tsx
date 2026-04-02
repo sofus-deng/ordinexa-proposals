@@ -4,10 +4,10 @@
  * Displays the AI-generated spatial planning recommendations in a clean format.
  */
 
-import type { SpatialPlanningRecommendations } from "@/types/proposal-generation";
+import type { ScopeRecommendations } from "@/types/proposal-generation";
 
 interface ExportSpatialPlanningProps {
-  content: SpatialPlanningRecommendations;
+  content: ScopeRecommendations;
 }
 
 export function ExportSpatialPlanning({ content }: ExportSpatialPlanningProps) {
@@ -18,7 +18,7 @@ export function ExportSpatialPlanning({ content }: ExportSpatialPlanningProps) {
         <p className="text-[var(--color-text-secondary)]">{content.overallStrategy}</p>
       </div>
       <div>
-        <h4 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Area Recommendations</h4>
+        <h4 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Scope Recommendations</h4>
         <div className="space-y-3">
           {content.areaRecommendations.map((rec, index) => (
             <div
@@ -33,7 +33,7 @@ export function ExportSpatialPlanning({ content }: ExportSpatialPlanningProps) {
         </div>
       </div>
       <div>
-        <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Circulation & Flow</h4>
+        <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Coordination Approach</h4>
         <p className="text-[var(--color-text-secondary)]">{content.circulationFlow}</p>
       </div>
       <div>

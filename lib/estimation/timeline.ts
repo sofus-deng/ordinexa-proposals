@@ -1,7 +1,7 @@
 /**
  * Timeline Calculation Module (ORDX-013C)
  *
- * Deterministic timeline calculation logic for interior fit-out projects.
+ * Deterministic timeline calculation logic for cross-industry proposal engagements.
  * All calculations are pure functions with no side effects.
  */
 
@@ -12,13 +12,13 @@ import type {
   PricingRepository,
 } from "./types";
 import {
-  MEETING_ROOM_WEEKS_PER_ROOM,
+  STAKEHOLDER_WEEKS_PER_PERSON,
   FEATURE_ADJUSTMENTS,
 } from "./repository";
 
 /**
- * Rush project timeline compression factor.
- * Rush projects compress timeline by this percentage.
+ * Expedited delivery timeline compression factor.
+ * Expedited engagements compress timeline by this percentage.
  */
 export const RUSH_COMPRESSION_FACTOR = 0.75; // 25% reduction
 
@@ -46,47 +46,47 @@ export function getApplicableTimelineAdjustments(
     timelineImpactWeeks: number;
   }> = [];
 
-  // Check each feature flag
-  if (input.includeReceptionArea) {
+  // Check each optional service module
+  if (input.includeDiscoveryWorkshop) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includeReceptionArea.id,
-      name: FEATURE_ADJUSTMENTS.includeReceptionArea.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeReceptionArea.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeDiscoveryWorkshop.id,
+      name: FEATURE_ADJUSTMENTS.includeDiscoveryWorkshop.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeDiscoveryWorkshop.timelineImpactWeeks,
     });
   }
-  if (input.includePantry) {
+  if (input.includeTrainingEnablement) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includePantry.id,
-      name: FEATURE_ADJUSTMENTS.includePantry.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includePantry.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeTrainingEnablement.id,
+      name: FEATURE_ADJUSTMENTS.includeTrainingEnablement.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeTrainingEnablement.timelineImpactWeeks,
     });
   }
-  if (input.includeGlassPartitions) {
+  if (input.includeImplementationSupport) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includeGlassPartitions.id,
-      name: FEATURE_ADJUSTMENTS.includeGlassPartitions.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeGlassPartitions.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeImplementationSupport.id,
+      name: FEATURE_ADJUSTMENTS.includeImplementationSupport.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeImplementationSupport.timelineImpactWeeks,
     });
   }
-  if (input.includeCustomStorage) {
+  if (input.includeCustomDeliverables) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includeCustomStorage.id,
-      name: FEATURE_ADJUSTMENTS.includeCustomStorage.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeCustomStorage.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeCustomDeliverables.id,
+      name: FEATURE_ADJUSTMENTS.includeCustomDeliverables.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeCustomDeliverables.timelineImpactWeeks,
     });
   }
-  if (input.includeSmartOfficeSetup) {
+  if (input.includeAutomationIntegration) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includeSmartOfficeSetup.id,
-      name: FEATURE_ADJUSTMENTS.includeSmartOfficeSetup.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeSmartOfficeSetup.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeAutomationIntegration.id,
+      name: FEATURE_ADJUSTMENTS.includeAutomationIntegration.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeAutomationIntegration.timelineImpactWeeks,
     });
   }
-  if (input.includeMEPWork) {
+  if (input.includeComplianceReview) {
     adjustments.push({
-      id: FEATURE_ADJUSTMENTS.includeMEPWork.id,
-      name: FEATURE_ADJUSTMENTS.includeMEPWork.name,
-      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeMEPWork.timelineImpactWeeks,
+      id: FEATURE_ADJUSTMENTS.includeComplianceReview.id,
+      name: FEATURE_ADJUSTMENTS.includeComplianceReview.name,
+      timelineImpactWeeks: FEATURE_ADJUSTMENTS.includeComplianceReview.timelineImpactWeeks,
     });
   }
 
@@ -94,15 +94,15 @@ export function getApplicableTimelineAdjustments(
 }
 
 /**
- * Calculates the meeting room timeline addition.
+ * Calculates the stakeholder coordination timeline addition.
  *
- * @param meetingRoomCount - Number of meeting rooms
- * @returns Additional weeks for meeting rooms
+ * @param stakeholderCount - Number of stakeholders or coordination tracks
+ * @returns Additional weeks for stakeholder coordination
  */
 export function calculateMeetingRoomTimelineAddition(
-  meetingRoomCount: number
+  stakeholderCount: number
 ): number {
-  return meetingRoomCount * MEETING_ROOM_WEEKS_PER_ROOM;
+  return stakeholderCount * STAKEHOLDER_WEEKS_PER_PERSON;
 }
 
 /**
@@ -110,7 +110,7 @@ export function calculateMeetingRoomTimelineAddition(
  *
  * Calculation order:
  * 1. Start with project type baseline
- * 2. Add meeting room weeks
+ * 2. Add stakeholder coordination weeks
  * 3. Add adjustment weeks
  * 4. Apply rush compression if applicable
  *
@@ -135,7 +135,7 @@ export function calculateTimelineBreakdown(
     0
   );
 
-  const rushCompression = input.rushProject ? RUSH_COMPRESSION_FACTOR : 1;
+  const rushCompression = input.expeditedDelivery ? RUSH_COMPRESSION_FACTOR : 1;
 
   return {
     baseline,
@@ -149,21 +149,21 @@ export function calculateTimelineBreakdown(
  * Calculates the final timeline range applying all factors.
  *
  * @param breakdown - Timeline breakdown with all factors
- * @param meetingRoomCount - Number of meeting rooms
+ * @param stakeholderCount - Number of stakeholders or coordination tracks
  * @returns Final timeline range
  */
 export function calculateFinalTimeline(
   breakdown: TimelineBreakdown,
-  meetingRoomCount: number
+  stakeholderCount: number
 ): TimelineRange {
   // Start with baseline
   let minWeeks = breakdown.baseline.minWeeks;
   let maxWeeks = breakdown.baseline.maxWeeks;
 
-  // Add meeting room weeks
-  const meetingRoomWeeks = calculateMeetingRoomTimelineAddition(meetingRoomCount);
-  minWeeks += meetingRoomWeeks;
-  maxWeeks += meetingRoomWeeks;
+  // Add stakeholder coordination weeks
+  const stakeholderWeeks = calculateMeetingRoomTimelineAddition(stakeholderCount);
+  minWeeks += stakeholderWeeks;
+  maxWeeks += stakeholderWeeks;
 
   // Add adjustment weeks
   minWeeks += breakdown.totalAdjustmentWeeks;
@@ -210,7 +210,7 @@ export async function calculateTimeline(
   };
 
   const breakdown = calculateTimelineBreakdown(baseline, input);
-  const final = calculateFinalTimeline(breakdown, input.meetingRoomCount);
+   const final = calculateFinalTimeline(breakdown, input.stakeholderCount);
 
   return {
     breakdown,

@@ -42,15 +42,16 @@ function buildExportMetadata(record: ProposalRecord): ExportMetadata {
     dueDate: record.dueDate,
     projectTypeName: formatProjectType(record.estimationResult.projectType.id),
     styleOptionName: formatStyle(record.estimationResult.styleOption.id),
-    areaPing: record.estimationInput.areaPing,
-    meetingRoomCount: record.estimationInput.meetingRoomCount,
-    includeReceptionArea: record.estimationInput.includeReceptionArea,
-    includePantry: record.estimationInput.includePantry,
-    includeGlassPartitions: record.estimationInput.includeGlassPartitions,
-    includeCustomStorage: record.estimationInput.includeCustomStorage,
-    includeSmartOfficeSetup: record.estimationInput.includeSmartOfficeSetup,
-    includeMEPWork: record.estimationInput.includeMEPWork,
-    rushProject: record.estimationInput.rushProject,
+    scopeSize: record.estimationInput.scopeSize,
+    complexityLevel: record.estimationInput.complexityLevel,
+    stakeholderCount: record.estimationInput.stakeholderCount,
+    includeDiscoveryWorkshop: record.estimationInput.includeDiscoveryWorkshop,
+    includeTrainingEnablement: record.estimationInput.includeTrainingEnablement,
+    includeImplementationSupport: record.estimationInput.includeImplementationSupport,
+    includeCustomDeliverables: record.estimationInput.includeCustomDeliverables,
+    includeAutomationIntegration: record.estimationInput.includeAutomationIntegration,
+    includeComplianceReview: record.estimationInput.includeComplianceReview,
+    expeditedDelivery: record.estimationInput.expeditedDelivery,
   };
 }
 
@@ -59,18 +60,19 @@ function buildExportMetadata(record: ProposalRecord): ExportMetadata {
  */
 function buildExportEstimationSummary(record: ProposalRecord): ExportEstimationSummary {
   const includedOptions = getIncludedOptionsList({
-    projectTypeId: record.estimationInput.projectTypeId,
-    styleMultiplierId: record.estimationInput.styleMultiplierId,
-    areaPing: record.estimationInput.areaPing,
-    meetingRoomCount: record.estimationInput.meetingRoomCount,
-    includeReceptionArea: record.estimationInput.includeReceptionArea,
-    includePantry: record.estimationInput.includePantry,
-    includeGlassPartitions: record.estimationInput.includeGlassPartitions,
-    includeCustomStorage: record.estimationInput.includeCustomStorage,
-    includeSmartOfficeSetup: record.estimationInput.includeSmartOfficeSetup,
-    includeMEPWork: record.estimationInput.includeMEPWork,
-    rushProject: record.estimationInput.rushProject,
-  });
+      projectTypeId: record.estimationInput.projectTypeId,
+      styleMultiplierId: record.estimationInput.styleMultiplierId,
+      scopeSize: record.estimationInput.scopeSize,
+      complexityLevel: record.estimationInput.complexityLevel,
+      stakeholderCount: record.estimationInput.stakeholderCount,
+      includeDiscoveryWorkshop: record.estimationInput.includeDiscoveryWorkshop,
+      includeTrainingEnablement: record.estimationInput.includeTrainingEnablement,
+      includeImplementationSupport: record.estimationInput.includeImplementationSupport,
+      includeCustomDeliverables: record.estimationInput.includeCustomDeliverables,
+      includeAutomationIntegration: record.estimationInput.includeAutomationIntegration,
+      includeComplianceReview: record.estimationInput.includeComplianceReview,
+      expeditedDelivery: record.estimationInput.expeditedDelivery,
+    });
 
   return {
     currency: record.estimationResult.currency,

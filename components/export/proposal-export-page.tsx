@@ -48,21 +48,21 @@ export function ProposalExportLayout({ viewModel }: ProposalExportPageProps) {
         )}
       </ExportSection>
 
-      {/* Design Direction */}
-      <ExportSection title="Design Direction" subtitle="Recommended approach">
+      {/* Proposed Approach */}
+      <ExportSection title="Proposed Approach" subtitle="Recommended approach">
         {viewModel.generatedContent ? (
-          <ExportDesignDirection content={viewModel.generatedContent.designDirection} />
+          <ExportDesignDirection content={viewModel.generatedContent.proposedApproach} />
         ) : (
-          <p className="text-[var(--color-text-muted)]">Design direction not available.</p>
+          <p className="text-[var(--color-text-muted)]">Proposed approach not available.</p>
         )}
       </ExportSection>
 
-      {/* Spatial Planning Recommendations */}
-      <ExportSection title="Spatial Planning" subtitle="Recommendations">
+      {/* Scope Recommendations */}
+      <ExportSection title="Scope Recommendations" subtitle="Recommendations">
         {viewModel.generatedContent ? (
-          <ExportSpatialPlanning content={viewModel.generatedContent.spatialPlanningRecommendations} />
+          <ExportSpatialPlanning content={viewModel.generatedContent.scopeRecommendations} />
         ) : (
-          <p className="text-[var(--color-text-muted)]">Spatial planning recommendations not available.</p>
+          <p className="text-[var(--color-text-muted)]">Scope recommendations not available.</p>
         )}
       </ExportSection>
 

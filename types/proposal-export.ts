@@ -48,32 +48,35 @@ export interface ExportMetadata {
   /** Style option name */
   styleOptionName: string;
 
-  /** Area in ping */
-  areaPing: number;
+  /** Relative scope size */
+  scopeSize: number;
 
-  /** Number of meeting rooms */
-  meetingRoomCount: number;
+  /** Delivery complexity on a 1-5 scale */
+  complexityLevel: number;
 
-  /** Whether reception area is included */
-  includeReceptionArea: boolean;
+  /** Stakeholder or coordination track count */
+  stakeholderCount: number;
 
-  /** Whether pantry is included */
-  includePantry: boolean;
+  /** Whether discovery workshop facilitation is included */
+  includeDiscoveryWorkshop: boolean;
 
-  /** Whether glass partitions are included */
-  includeGlassPartitions: boolean;
+  /** Whether training and enablement support is included */
+  includeTrainingEnablement: boolean;
 
-  /** Whether custom storage is included */
-  includeCustomStorage: boolean;
+  /** Whether implementation support is included */
+  includeImplementationSupport: boolean;
 
-  /** Whether smart office setup is included */
-  includeSmartOfficeSetup: boolean;
+  /** Whether custom deliverables are included */
+  includeCustomDeliverables: boolean;
 
-  /** Whether MEP work is included */
-  includeMEPWork: boolean;
+  /** Whether automation integration is included */
+  includeAutomationIntegration: boolean;
 
-  /** Whether this is a rush project */
-  rushProject: boolean;
+  /** Whether compliance review is included */
+  includeComplianceReview: boolean;
+
+  /** Whether this is an expedited delivery engagement */
+  expeditedDelivery: boolean;
 }
 
 /**

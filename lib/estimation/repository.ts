@@ -37,19 +37,19 @@ export function createMockPricingRepository(): PricingRepository {
  * This defines which adjustments are triggered by which input options.
  */
 export const INPUT_TO_ADJUSTMENT_MAP: Record<string, string> = {
-  includeSmartOfficeSetup: "smart-office-integration",
+  includeAutomationIntegration: "systems-integration",
 } as const;
 
 /**
  * Rush project adjustment configuration.
- * Applied when rushProject is true.
+ * Applied when expeditedDelivery is true.
  */
 export const RUSH_ADJUSTMENT = {
-  id: "rush-project",
-  name: "Rush Project",
+  id: "expedited-delivery",
+  name: "Expedited Delivery",
   budgetImpactType: "percentage" as const,
-  budgetImpactValue: 15, // 15% premium for rush
-  timelineImpactWeeks: 0, // Timeline compression handled separately
+  budgetImpactValue: 15,
+  timelineImpactWeeks: 0,
 };
 
 /**
@@ -57,8 +57,8 @@ export const RUSH_ADJUSTMENT = {
  * Adjusts budget based on project size relative to baseline.
  */
 export const AREA_THRESHOLDS = {
-  /** Baseline area in ping for standard pricing */
-  baselinePing: 50,
+  /** Baseline scope size for standard pricing */
+  baselineSize: 50,
 
   /** Minimum area factor (for very small projects) */
   minFactor: 0.7,
@@ -66,59 +66,59 @@ export const AREA_THRESHOLDS = {
   /** Maximum area factor (for very large projects) */
   maxFactor: 1.5,
 
-  /** Factor increment per 10 ping deviation from baseline */
-  factorPerTenPing: 0.05,
+  /** Factor increment per 10 size points deviation from baseline */
+  factorPerTenUnits: 0.05,
 };
 
 /**
- * Meeting room timeline addition per room.
- * Each meeting room adds this many weeks to the timeline.
+ * Stakeholder coordination timeline addition per stakeholder.
+ * Each stakeholder/track adds this many weeks to the timeline.
  */
-export const MEETING_ROOM_WEEKS_PER_ROOM = 0.5;
+export const STAKEHOLDER_WEEKS_PER_PERSON = 0.5;
 
 /**
  * Additional adjustment configurations for optional features.
  * These are not in the main pricing adjustments list but are triggered by input flags.
  */
 export const FEATURE_ADJUSTMENTS = {
-  includeReceptionArea: {
-    id: "reception-area",
-    name: "Reception Area",
+  includeDiscoveryWorkshop: {
+    id: "discovery-workshop",
+    name: "Discovery Workshop",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 8,
     timelineImpactWeeks: 1,
   },
-  includePantry: {
-    id: "pantry-facilities",
-    name: "Pantry Facilities",
+  includeTrainingEnablement: {
+    id: "training-enablement",
+    name: "Training & Enablement",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 5,
     timelineImpactWeeks: 0.5,
   },
-  includeGlassPartitions: {
-    id: "glass-partitions",
-    name: "Glass Partitions",
+  includeImplementationSupport: {
+    id: "implementation-support",
+    name: "Implementation Support",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 7,
     timelineImpactWeeks: 1,
   },
-  includeCustomStorage: {
-    id: "custom-storage",
-    name: "Custom Storage",
+  includeCustomDeliverables: {
+    id: "custom-deliverables",
+    name: "Custom Deliverables",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 4,
     timelineImpactWeeks: 0.5,
   },
-  includeSmartOfficeSetup: {
-    id: "smart-office-integration",
-    name: "Smart Office Integration",
+  includeAutomationIntegration: {
+    id: "systems-integration",
+    name: "Automation Integration",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 9,
     timelineImpactWeeks: 2,
   },
-  includeMEPWork: {
-    id: "mep-work",
-    name: "MEP Work",
+  includeComplianceReview: {
+    id: "compliance-review",
+    name: "Compliance Review",
     budgetImpactType: "percentage" as const,
     budgetImpactValue: 12,
     timelineImpactWeeks: 2,

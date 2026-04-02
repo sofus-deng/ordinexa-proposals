@@ -26,8 +26,8 @@ export interface ProjectUnderstanding {
   businessContext: string;
   /** Identified project objectives */
   objectives: string[];
-  /** Understanding of spatial requirements */
-  spatialRequirements: string;
+  /** Understanding of operational needs and context */
+  operationalNeeds: string;
   /** Key constraints identified */
   constraints: string[];
 }
@@ -35,17 +35,17 @@ export interface ProjectUnderstanding {
 /**
  * Design direction recommendations.
  */
-export interface DesignDirection {
-  /** Overall design philosophy recommendation */
-  philosophy: string;
-  /** Recommended materials and finishes */
-  materialsFinishes: string[];
-  /** Color palette recommendations */
-  colorPalette: string;
-  /** Lighting design approach */
-  lightingApproach: string;
-  /** Furniture and equipment recommendations */
-  furnitureEquipment: string[];
+export interface ProposedApproach {
+  /** Overall recommended approach summary */
+  approachSummary: string;
+  /** Recommended workstreams or service components */
+  workstreams: string[];
+  /** Suggested engagement model */
+  engagementModel: string;
+  /** Recommended delivery approach */
+  deliveryApproach: string;
+  /** Tools, capabilities, or enablement elements */
+  capabilityEnablers: string[];
 }
 
 /**
@@ -63,12 +63,12 @@ export interface SpatialRecommendation {
 /**
  * Spatial planning recommendations section.
  */
-export interface SpatialPlanningRecommendations {
-  /** Overall spatial strategy */
+export interface ScopeRecommendations {
+  /** Overall scope strategy */
   overallStrategy: string;
-  /** Specific area recommendations */
+  /** Specific workstream or scope recommendations */
   areaRecommendations: SpatialRecommendation[];
-  /** Flow and circulation considerations */
+  /** Cross-functional coordination considerations */
   circulationFlow: string;
   /** Flexibility and future expansion considerations */
   flexibilityConsiderations: string;
@@ -145,10 +145,10 @@ export interface GeneratedProposalContent {
   executiveSummary: ExecutiveSummary;
   /** Project understanding section */
   projectUnderstanding: ProjectUnderstanding;
-  /** Design direction section */
-  designDirection: DesignDirection;
-  /** Spatial planning recommendations */
-  spatialPlanningRecommendations: SpatialPlanningRecommendations;
+  /** Proposed approach section */
+  proposedApproach: ProposedApproach;
+  /** Scope recommendations */
+  scopeRecommendations: ScopeRecommendations;
   /** Budget narrative */
   budgetNarrative: BudgetNarrative;
   /** Timeline narrative */
@@ -198,10 +198,12 @@ export interface ProposalGenerationInput {
   };
   /** Estimation results (pre-calculated, not computed by AI) */
   estimationContext: {
-    /** Area in ping */
-    areaPing: number;
-    /** Number of meeting rooms */
-    meetingRoomCount: number;
+    /** Relative scope size */
+    scopeSize: number;
+    /** Delivery complexity on a 1-5 scale */
+    complexityLevel: number;
+    /** Stakeholder or coordination track count */
+    stakeholderCount: number;
     /** Included options */
     includedOptions: string[];
     /** Budget range */
@@ -217,24 +219,24 @@ export interface ProposalGenerationInput {
     };
     /** Style multiplier applied */
     styleMultiplier: number;
-    /** Whether rush project */
-    isRushProject: boolean;
+    /** Whether accelerated delivery is required */
+    isExpeditedDelivery: boolean;
   };
-  /** Fit-out options selected */
-  fitOutOptions: {
-    includeReceptionArea: boolean;
-    includePantry: boolean;
-    includeGlassPartitions: boolean;
-    includeCustomStorage: boolean;
-    includeSmartOfficeSetup: boolean;
-    includeMEPWork: boolean;
+  /** Optional service modules selected */
+  serviceModules: {
+    includeDiscoveryWorkshop: boolean;
+    includeTrainingEnablement: boolean;
+    includeImplementationSupport: boolean;
+    includeCustomDeliverables: boolean;
+    includeAutomationIntegration: boolean;
+    includeComplianceReview: boolean;
   };
-  /** Interior design domain context hints */
+  /** Optional generation hints */
   domainContext?: {
-    /** Specific design preferences */
-    designPreferences?: string[];
-    /** Brand guidelines reference */
-    brandGuidelines?: string;
+    /** Preferred delivery or collaboration preferences */
+    deliveryPreferences?: string[];
+    /** Reference principles or standards */
+    referenceGuidelines?: string;
     /** Special requirements */
     specialRequirements?: string[];
   };

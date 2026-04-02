@@ -60,8 +60,9 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
       scope: proposal.scope,
     },
     estimationContext: {
-      areaPing: proposal.areaPing,
-      meetingRoomCount: proposal.meetingRoomCount,
+      scopeSize: proposal.scopeSize,
+      complexityLevel: proposal.complexityLevel,
+      stakeholderCount: proposal.stakeholderCount,
       includedOptions: [],
       budgetRange: {
         min: proposal.estimate.estimatedTotal,
@@ -73,15 +74,15 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
         maxWeeks: 12,
       },
       styleMultiplier: 1.0,
-      isRushProject: proposal.rushProject,
+      isExpeditedDelivery: proposal.expeditedDelivery,
     },
-    fitOutOptions: {
-      includeReceptionArea: proposal.includeReceptionArea,
-      includePantry: proposal.includePantry,
-      includeGlassPartitions: proposal.includeGlassPartitions,
-      includeCustomStorage: proposal.includeCustomStorage,
-      includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
-      includeMEPWork: proposal.includeMEPWork,
+    serviceModules: {
+      includeDiscoveryWorkshop: proposal.includeDiscoveryWorkshop,
+      includeTrainingEnablement: proposal.includeTrainingEnablement,
+      includeImplementationSupport: proposal.includeImplementationSupport,
+      includeCustomDeliverables: proposal.includeCustomDeliverables,
+      includeAutomationIntegration: proposal.includeAutomationIntegration,
+      includeComplianceReview: proposal.includeComplianceReview,
     },
   };
   const generatedContent = generateMockContent(aiInput, "mock-provider-v1");
@@ -101,15 +102,16 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
     estimationInput: {
       projectTypeId: proposal.projectTypeId,
       styleMultiplierId: proposal.styleOptionId,
-      areaPing: proposal.areaPing,
-      meetingRoomCount: proposal.meetingRoomCount,
-      includeReceptionArea: proposal.includeReceptionArea,
-      includePantry: proposal.includePantry,
-      includeGlassPartitions: proposal.includeGlassPartitions,
-      includeCustomStorage: proposal.includeCustomStorage,
-      includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
-      includeMEPWork: proposal.includeMEPWork,
-      rushProject: proposal.rushProject,
+      scopeSize: proposal.scopeSize,
+      complexityLevel: proposal.complexityLevel,
+      stakeholderCount: proposal.stakeholderCount,
+      includeDiscoveryWorkshop: proposal.includeDiscoveryWorkshop,
+      includeTrainingEnablement: proposal.includeTrainingEnablement,
+      includeImplementationSupport: proposal.includeImplementationSupport,
+      includeCustomDeliverables: proposal.includeCustomDeliverables,
+      includeAutomationIntegration: proposal.includeAutomationIntegration,
+      includeComplianceReview: proposal.includeComplianceReview,
+      expeditedDelivery: proposal.expeditedDelivery,
     },
     estimationResult: {
       projectType: {
@@ -122,8 +124,9 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
         multiplier: 1.0, // Default for mock
       },
       input: {
-        areaPing: proposal.areaPing,
-        meetingRoomCount: proposal.meetingRoomCount,
+        scopeSize: proposal.scopeSize,
+        complexityLevel: proposal.complexityLevel,
+        stakeholderCount: proposal.stakeholderCount,
         includedOptions: [], // Simplified for mock
       },
       budget: {
@@ -161,10 +164,10 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
           maxWeeks: 12,
         },
         adjustmentsWeeks: 0,
-        rushCompression: proposal.rushProject ? 0.75 : 0,
+        rushCompression: proposal.expeditedDelivery ? 0.75 : 0,
         final: {
-          minWeeks: proposal.rushProject ? 6 : 8,
-          maxWeeks: proposal.rushProject ? 9 : 12,
+          minWeeks: proposal.expeditedDelivery ? 6 : 8,
+          maxWeeks: proposal.expeditedDelivery ? 9 : 12,
         },
         breakdown: {
           baseline: {
@@ -172,7 +175,7 @@ function legacyToRecord(proposal: Proposal): ProposalRecord {
             maxWeeks: 12,
           },
           adjustments: [],
-          rushCompression: proposal.rushProject ? 0.75 : 0,
+          rushCompression: proposal.expeditedDelivery ? 0.75 : 0,
           totalAdjustmentWeeks: 0,
         },
       },

@@ -5,7 +5,7 @@
  * without requiring a live Gemini API connection.
  *
  * Features:
- * - Realistic interior fit-out domain content
+ * - Realistic cross-industry proposal content
  * - Consistent output structure
  * - Simulated latency for realistic testing
  * - Deterministic output based on input (for testing)
@@ -40,21 +40,21 @@ const DEFAULT_CONFIG = {
 } as const;
 
 /**
- * Interior fit-out domain templates for realistic mock content.
+ * Cross-industry domain templates for realistic mock content.
  */
 const DOMAIN_TEMPLATES = {
   executiveSummary: {
-    overview: (client: string, area: number, projectType: string) =>
-      `This proposal outlines a comprehensive ${projectType.toLowerCase()} solution for ${client}, covering ${area} ping of premium commercial space. Our approach combines functional excellence with aesthetic sophistication to create a workspace that enhances productivity and reflects your corporate identity.`,
+    overview: (client: string, scopeSize: number, projectType: string) =>
+      `This proposal outlines a comprehensive ${projectType.toLowerCase()} engagement for ${client}, covering a scope sized at ${scopeSize} units. Our approach balances strategic clarity, execution readiness, and stakeholder alignment to support durable outcomes.`,
     valueProposition: (style: string) =>
-      `By leveraging our expertise in ${style.toLowerCase()} design and proven project delivery methodologies, we deliver exceptional value through optimized space utilization, sustainable material selection, and efficient project execution that minimizes business disruption.`,
+      `By leveraging our expertise in ${style.toLowerCase()} delivery and proven project methodologies, we create value through clear scope framing, focused prioritization, and execution practices that reduce delivery risk while supporting measurable results.`,
     recommendation: (budget: { min: number; max: number }, weeks: { minWeeks: number; maxWeeks: number }) =>
-      `We recommend proceeding with the proposed design direction within the NT$${Math.round(budget.min / 1000)}K-${Math.round(budget.max / 1000)}K budget range, targeting a ${weeks.minWeeks}-${weeks.maxWeeks} week implementation timeline to achieve optimal results for your business objectives.`,
+      `We recommend proceeding with the proposed engagement approach within the NT$${Math.round(budget.min / 1000)}K-${Math.round(budget.max / 1000)}K budget range, targeting a ${weeks.minWeeks}-${weeks.maxWeeks} week delivery window to align investment with operational outcomes.`,
   },
 
   projectUnderstanding: {
     businessContext: (industry: string) =>
-      `As a leader in the ${industry} sector, your organization requires a workspace that supports both collaborative innovation and focused individual work. The new office design should reinforce your brand values while providing flexibility for future growth and evolving work patterns.`,
+      `As an organization operating in the ${industry} sector, your team requires a proposal approach that balances stakeholder expectations, delivery discipline, and practical implementation readiness. The engagement should support current priorities while preserving flexibility for evolving needs.`,
     objectives: [
       "Create a professional environment that enhances employee productivity and well-being",
       "Maximize space efficiency while maintaining comfortable circulation and collaboration zones",
@@ -62,76 +62,76 @@ const DOMAIN_TEMPLATES = {
       "Ensure scalability for future team growth without major structural changes",
       "Achieve project completion within budget and timeline constraints",
     ],
-    spatialRequirements: (area: number, meetingRooms: number) =>
-      `The ${area} ping space must accommodate ${meetingRooms} meeting rooms, open work areas, and supporting facilities while maintaining optimal circulation and natural light distribution throughout.`,
+    spatialRequirements: (scopeSize: number, stakeholderCount: number) =>
+      `The engagement scope of ${scopeSize} units must support ${stakeholderCount} stakeholder tracks, coordinated decision-making, and clear rollout sequencing while maintaining manageable execution overhead.`,
     constraints: [
-      "Building management approval required for structural modifications",
-      "MEP work must comply with local building codes and fire safety regulations",
-      "Construction noise and activities must minimize disruption to neighboring tenants",
-      "Material lead times may impact project schedule for premium finishes",
+      "Key approvals may introduce additional review cycles before implementation begins",
+      "Operational, compliance, or governance constraints may affect delivery sequencing",
+      "Stakeholder availability may influence workshop cadence and decision timing",
+      "Specialized dependencies may affect schedule confidence for higher-complexity scopes",
     ],
   },
 
   designDirection: {
     philosophy: (style: string) =>
-      `Our design philosophy centers on creating a ${style.toLowerCase()} aesthetic that balances form and function. We emphasize clean lines, natural materials, and thoughtful spatial planning to create an environment that inspires creativity while supporting daily operational needs.`,
+      `Our recommended approach uses a ${style.toLowerCase()} model that balances strategic guidance with delivery accountability. We prioritize practical sequencing, clearly defined outputs, and customer-friendly governance throughout the engagement.`,
     materialsFinishes: [
-      "Premium low-emission carpet tiles with acoustic backing for open areas",
-      "Engineered hardwood flooring for executive and meeting spaces",
-      "Floor-to-ceiling glass partitions with integrated blinds for meeting rooms",
-      "Natural stone or quartz reception desk with integrated lighting",
-      "Acoustic wall panels in brand-aligned colors for noise control",
+      "Discovery and alignment activities to clarify objectives and constraints",
+      "Core delivery workstreams structured around measurable outcomes",
+      "Implementation support to improve follow-through and adoption readiness",
+      "Governance checkpoints to support timely reviews and decisions",
+      "Customer-facing summaries tailored for stakeholder communication",
     ],
     colorPalette: (style: string) =>
-      `The ${style.toLowerCase()} palette features warm neutrals (taupe, warm gray, soft white) as the foundation, accented by your brand colors and natural wood tones. Metallic accents in brushed brass or matte black hardware add sophistication.`,
+      `The ${style.toLowerCase()} engagement model combines focused advisory input, structured delivery routines, and transparent reporting to maintain momentum and confidence.`,
     lightingApproach:
-      "Our lighting strategy combines abundant natural light with layered artificial lighting: ambient LED panels for general illumination, task lighting at workstations, and decorative fixtures in reception and collaborative areas. All lighting is dimmable and tunable for circadian rhythm support.",
+      "Our delivery approach combines clear phase gates, recurring stakeholder alignment, and practical feedback loops so decisions can be made quickly without losing traceability.",
     furnitureEquipment: [
-      "Height-adjustable desks with integrated cable management for all workstations",
-      "Ergonomic task chairs with lumbar support and adjustable armrests",
-      "Modular sofa systems for collaborative areas with power integration",
-      "Conference tables with integrated AV and power capabilities",
-      "Storage solutions including personal lockers and filing systems",
+      "Decision logs and working-session summaries",
+      "Phased delivery plans with milestone checkpoints",
+      "Stakeholder-ready artifacts for reviews and approvals",
+      "Enablement materials to support adoption and handoff",
+      "Risk, assumption, and dependency tracking artifacts",
     ],
   },
 
   spatialPlanning: {
-    overallStrategy: (area: number) =>
-      `The ${area} ping floor plate is organized around a central circulation spine, with open workspace radiating outward to maximize natural light penetration. Meeting rooms and private offices are positioned along the core, while collaborative zones anchor the corners with views.`,
+    overallStrategy: (scopeSize: number) =>
+      `The ${scopeSize} unit engagement is organized around a clear delivery spine: discovery first, prioritized workstreams second, and implementation readiness throughout. This structure keeps the scope manageable while preserving flexibility for revisions and follow-on phases.`,
     areaRecommendations: [
       {
-        area: "Reception",
+        area: "Discovery & Alignment",
         recommendation:
-          "Create an impressive entry experience with a feature wall, comfortable waiting seating, and clear wayfinding to meeting rooms and work areas.",
+          "Use early workshops to confirm objectives, constraints, success measures, and decision-makers before deeper execution begins.",
         rationale:
-          "First impressions matter - the reception sets the tone for client visits and candidate interviews.",
+          "Early alignment reduces rework and gives later recommendations a stronger operational foundation.",
       },
       {
-        area: "Open Workspace",
+        area: "Core Delivery Workstream",
         recommendation:
-          "Organize workstations in clusters of 4-6 with shared amenities nearby, maintaining minimum 1.8m circulation paths.",
+          "Sequence the main workstream into tightly scoped phases with explicit checkpoints, owners, and review criteria.",
         rationale:
-          "Clustered arrangements balance collaboration opportunities with acoustic management and efficient space utilization.",
+          "Phased delivery improves predictability and helps stakeholders absorb decisions incrementally.",
       },
       {
-        area: "Meeting Rooms",
+        area: "Stakeholder Review Layer",
         recommendation:
-          "Size meeting rooms for 4-6, 8-10, and 12-16 person capacities with appropriate AV equipment and acoustic treatment.",
+          "Create lightweight stakeholder review artifacts that support fast decisions without adding unnecessary approval burden.",
         rationale:
-          "Varied room sizes accommodate different meeting types while maximizing utilization rates.",
+          "Focused review materials keep engagement momentum while preserving accountability.",
       },
       {
-        area: "Pantry",
+        area: "Enablement & Handoff",
         recommendation:
-          "Position pantry as a social hub with varied seating options, natural light, and connection to outdoor space if available.",
+          "Package rollout guidance, enablement support, and post-delivery recommendations into a clear handoff path.",
         rationale:
-          "The pantry serves as the office 'town square' for informal collaboration and breaks.",
+          "Structured handoff reduces adoption friction and helps the customer sustain value after delivery.",
       },
     ],
     circulationFlow:
-      "Primary circulation follows a clear loop around the core, with secondary paths through open workspace. Sight lines are maintained from reception to major destinations, and glass partitions provide visual connection while maintaining acoustic separation.",
+      "Primary coordination flows through a central cadence of checkpoints and stakeholder reviews, while secondary coordination happens inside individual workstreams. This keeps decisions visible without overwhelming contributors.",
     flexibilityConsiderations:
-      "The design incorporates modular furniture systems and demountable partitions where possible, allowing future reconfiguration as team sizes change. Infrastructure includes spare conduit capacity for technology upgrades.",
+      "The engagement structure supports phased expansion, revised priorities, and future work packages by keeping deliverables modular and assumptions explicit.",
   },
 
   budgetNarrative: {
@@ -259,7 +259,7 @@ export function generateMockContent(
     executiveSummary: {
       overview: DOMAIN_TEMPLATES.executiveSummary.overview(
         projectContext.clientName,
-        estimationContext.areaPing,
+        estimationContext.scopeSize,
         projectContext.projectTypeName
       ),
       valueProposition: DOMAIN_TEMPLATES.executiveSummary.valueProposition(
@@ -275,26 +275,26 @@ export function generateMockContent(
         projectContext.industry
       ),
       objectives: DOMAIN_TEMPLATES.projectUnderstanding.objectives,
-      spatialRequirements: DOMAIN_TEMPLATES.projectUnderstanding.spatialRequirements(
-        estimationContext.areaPing,
-        estimationContext.meetingRoomCount
+      operationalNeeds: DOMAIN_TEMPLATES.projectUnderstanding.spatialRequirements(
+        estimationContext.scopeSize,
+        estimationContext.stakeholderCount
       ),
       constraints: DOMAIN_TEMPLATES.projectUnderstanding.constraints,
     },
-    designDirection: {
-      philosophy: DOMAIN_TEMPLATES.designDirection.philosophy(
+    proposedApproach: {
+      approachSummary: DOMAIN_TEMPLATES.designDirection.philosophy(
         projectContext.styleOptionName
       ),
-      materialsFinishes: DOMAIN_TEMPLATES.designDirection.materialsFinishes,
-      colorPalette: DOMAIN_TEMPLATES.designDirection.colorPalette(
+      workstreams: DOMAIN_TEMPLATES.designDirection.materialsFinishes,
+      engagementModel: DOMAIN_TEMPLATES.designDirection.colorPalette(
         projectContext.styleOptionName
       ),
-      lightingApproach: DOMAIN_TEMPLATES.designDirection.lightingApproach,
-      furnitureEquipment: DOMAIN_TEMPLATES.designDirection.furnitureEquipment,
+      deliveryApproach: DOMAIN_TEMPLATES.designDirection.lightingApproach,
+      capabilityEnablers: DOMAIN_TEMPLATES.designDirection.furnitureEquipment,
     },
-    spatialPlanningRecommendations: {
+    scopeRecommendations: {
       overallStrategy: DOMAIN_TEMPLATES.spatialPlanning.overallStrategy(
-        estimationContext.areaPing
+        estimationContext.scopeSize
       ),
       areaRecommendations: DOMAIN_TEMPLATES.spatialPlanning.areaRecommendations,
       circulationFlow: DOMAIN_TEMPLATES.spatialPlanning.circulationFlow,

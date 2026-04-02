@@ -10,38 +10,41 @@
  * Maps directly to the proposal form fields and pricing rule lookups.
  */
 export interface EstimationInput {
-  /** Project type identifier (e.g., "office-fit-out") */
+  /** Project type identifier */
   projectTypeId: string;
 
-  /** Style multiplier identifier (e.g., "modern-corporate") */
+  /** Delivery model identifier */
   styleMultiplierId: string;
 
-  /** Area in ping (1 ping ≈ 3.3 m² / 35.6 ft²) */
-  areaPing: number;
+  /** Relative scope size used for sizing-based estimate adjustments */
+  scopeSize: number;
 
-  /** Number of meeting rooms required */
-  meetingRoomCount: number;
+  /** Delivery complexity on a 1-5 scale */
+  complexityLevel: number;
 
-  /** Whether to include reception area in scope */
-  includeReceptionArea: boolean;
+  /** Number of primary stakeholders or coordination tracks */
+  stakeholderCount: number;
 
-  /** Whether to include pantry facilities */
-  includePantry: boolean;
+  /** Whether to include discovery workshop facilitation */
+  includeDiscoveryWorkshop: boolean;
 
-  /** Whether to include glass partition systems */
-  includeGlassPartitions: boolean;
+  /** Whether to include training and enablement support */
+  includeTrainingEnablement: boolean;
 
-  /** Whether to include custom storage solutions */
-  includeCustomStorage: boolean;
+  /** Whether to include implementation support */
+  includeImplementationSupport: boolean;
 
-  /** Whether to include smart office integration */
-  includeSmartOfficeSetup: boolean;
+  /** Whether to include custom deliverables */
+  includeCustomDeliverables: boolean;
 
-  /** Whether to include MEP (mechanical, electrical, plumbing) work */
-  includeMEPWork: boolean;
+  /** Whether to include automation or systems integration */
+  includeAutomationIntegration: boolean;
 
-  /** Whether this is a rush project with compressed timeline */
-  rushProject: boolean;
+  /** Whether to include compliance and governance review */
+  includeComplianceReview: boolean;
+
+  /** Whether this is an accelerated delivery engagement */
+  expeditedDelivery: boolean;
 }
 
 /**
@@ -126,8 +129,9 @@ export interface EstimateSummary {
 
   /** Input parameters used for calculation */
   input: {
-    areaPing: number;
-    meetingRoomCount: number;
+    scopeSize: number;
+    complexityLevel: number;
+    stakeholderCount: number;
     includedOptions: string[];
   };
 

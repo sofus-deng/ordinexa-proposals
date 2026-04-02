@@ -1,7 +1,7 @@
 /**
  * Estimation Engine Module
  *
- * Deterministic estimation calculations for interior fit-out projects.
+ * Deterministic estimation calculations for cross-industry proposal engagements.
  * This module provides pure, testable functions for budget and timeline estimation.
  *
  * Usage:
@@ -10,17 +10,18 @@
  *
  * const repository = createMockPricingRepository();
  * const summary = await calculateEstimate(repository, {
- *   projectTypeId: "office-fit-out",
- *   styleMultiplierId: "modern-corporate",
- *   areaPing: 100,
- *   meetingRoomCount: 3,
- *   includeReceptionArea: true,
- *   includePantry: true,
- *   includeGlassPartitions: false,
- *   includeCustomStorage: true,
- *   includeSmartOfficeSetup: false,
- *   includeMEPWork: true,
- *   rushProject: false,
+ *   projectTypeId: "strategic-initiative",
+ *   styleMultiplierId: "standard-delivery",
+ *   scopeSize: 100,
+ *   complexityLevel: 3,
+ *   stakeholderCount: 5,
+ *   includeDiscoveryWorkshop: true,
+ *   includeTrainingEnablement: true,
+ *   includeImplementationSupport: false,
+ *   includeCustomDeliverables: true,
+ *   includeAutomationIntegration: false,
+ *   includeComplianceReview: true,
+ *   expeditedDelivery: false,
  * });
  * ```
  */
@@ -60,28 +61,30 @@ export { getIncludedOptionsList } from "./engine";
 export function proposalToEstimationInput(proposal: {
   projectTypeId: string;
   styleOptionId: string;
-  areaPing: number;
-  meetingRoomCount: number;
-  includeReceptionArea: boolean;
-  includePantry: boolean;
-  includeGlassPartitions: boolean;
-  includeCustomStorage: boolean;
-  includeSmartOfficeSetup: boolean;
-  includeMEPWork: boolean;
-  rushProject: boolean;
+  scopeSize: number;
+  complexityLevel: number;
+  stakeholderCount: number;
+  includeDiscoveryWorkshop: boolean;
+  includeTrainingEnablement: boolean;
+  includeImplementationSupport: boolean;
+  includeCustomDeliverables: boolean;
+  includeAutomationIntegration: boolean;
+  includeComplianceReview: boolean;
+  expeditedDelivery: boolean;
 }): import("./types").EstimationInput {
   return {
     projectTypeId: proposal.projectTypeId,
     styleMultiplierId: proposal.styleOptionId,
-    areaPing: proposal.areaPing,
-    meetingRoomCount: proposal.meetingRoomCount,
-    includeReceptionArea: proposal.includeReceptionArea,
-    includePantry: proposal.includePantry,
-    includeGlassPartitions: proposal.includeGlassPartitions,
-    includeCustomStorage: proposal.includeCustomStorage,
-    includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
-    includeMEPWork: proposal.includeMEPWork,
-    rushProject: proposal.rushProject,
+    scopeSize: proposal.scopeSize,
+    complexityLevel: proposal.complexityLevel,
+    stakeholderCount: proposal.stakeholderCount,
+    includeDiscoveryWorkshop: proposal.includeDiscoveryWorkshop,
+    includeTrainingEnablement: proposal.includeTrainingEnablement,
+    includeImplementationSupport: proposal.includeImplementationSupport,
+    includeCustomDeliverables: proposal.includeCustomDeliverables,
+    includeAutomationIntegration: proposal.includeAutomationIntegration,
+    includeComplianceReview: proposal.includeComplianceReview,
+    expeditedDelivery: proposal.expeditedDelivery,
   };
 }
 
@@ -105,7 +108,7 @@ export {
 // Configuration exports (for testing/overrides)
 export {
   AREA_THRESHOLDS,
-  MEETING_ROOM_WEEKS_PER_ROOM,
+  STAKEHOLDER_WEEKS_PER_PERSON,
   FEATURE_ADJUSTMENTS,
   RUSH_ADJUSTMENT,
 } from "./repository";

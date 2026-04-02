@@ -20,7 +20,7 @@ export function ExportHeader({ metadata }: ExportHeaderProps) {
           {metadata.title}
         </h1>
         <p className="mt-2 text-lg text-[var(--color-text-secondary)]">
-          Interior Fit-Out Proposal
+          Cross-Industry Proposal
         </p>
       </div>
 
@@ -44,39 +44,40 @@ export function ExportHeader({ metadata }: ExportHeaderProps) {
         </div>
 
         <div>
-          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Project Specifications</h3>
+          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Engagement Specifications</h3>
           <div className="space-y-1 text-[var(--color-text-secondary)]">
             <p><span className="font-medium">Type:</span> {metadata.projectTypeName}</p>
-            <p><span className="font-medium">Style:</span> {metadata.styleOptionName}</p>
-            <p><span className="font-medium">Area:</span> {metadata.areaPing} ping</p>
-            <p><span className="font-medium">Meeting Rooms:</span> {metadata.meetingRoomCount}</p>
+            <p><span className="font-medium">Delivery Model:</span> {metadata.styleOptionName}</p>
+            <p><span className="font-medium">Scope Size:</span> {metadata.scopeSize}</p>
+            <p><span className="font-medium">Complexity:</span> {metadata.complexityLevel}</p>
+            <p><span className="font-medium">Stakeholders:</span> {metadata.stakeholderCount}</p>
           </div>
         </div>
 
         <div>
-          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Included Features</h3>
+          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Included Modules</h3>
           <ul className="space-y-1 text-[var(--color-text-secondary)]">
-            {metadata.includeReceptionArea && <li>• Reception area</li>}
-            {metadata.includePantry && <li>• Pantry</li>}
-            {metadata.includeGlassPartitions && <li>• Glass partitions</li>}
-            {metadata.includeCustomStorage && <li>• Custom storage</li>}
-            {metadata.includeSmartOfficeSetup && <li>• Smart office setup</li>}
-            {metadata.includeMEPWork && <li>• MEP work</li>}
-            {metadata.rushProject && <li>• Rush project</li>}
+            {metadata.includeDiscoveryWorkshop && <li>• Discovery workshop</li>}
+            {metadata.includeTrainingEnablement && <li>• Training and enablement</li>}
+            {metadata.includeImplementationSupport && <li>• Implementation support</li>}
+            {metadata.includeCustomDeliverables && <li>• Custom deliverables</li>}
+            {metadata.includeAutomationIntegration && <li>• Automation integration</li>}
+            {metadata.includeComplianceReview && <li>• Compliance review</li>}
+            {metadata.expeditedDelivery && <li>• Expedited delivery</li>}
           </ul>
         </div>
       </div>
 
       {metadata.summary && (
         <div className="mt-6 rounded-lg bg-[var(--color-surface-muted)] p-4">
-          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Project Summary</h3>
+          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Engagement Summary</h3>
           <p className="text-[var(--color-text-secondary)]">{metadata.summary}</p>
         </div>
       )}
 
       {metadata.scope.length > 0 && (
         <div className="mt-4">
-          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Project Scope</h3>
+          <h3 className="mb-2 font-semibold text-[var(--color-text-primary)]">Proposal Scope</h3>
           <ul className="ml-4 list-disc space-y-1 text-[var(--color-text-secondary)]">
             {metadata.scope.map((item, index) => (
               <li key={index}>{item}</li>

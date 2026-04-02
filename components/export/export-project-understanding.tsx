@@ -26,8 +26,8 @@ export function ExportProjectUnderstanding({ content }: ExportProjectUnderstandi
         </ul>
       </div>
       <div>
-        <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Spatial Requirements</h4>
-        <p className="text-[var(--color-text-secondary)]">{content.spatialRequirements}</p>
+        <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Operational Needs</h4>
+        <p className="text-[var(--color-text-secondary)]">{content.operationalNeeds}</p>
       </div>
       <div>
         <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Constraints</h4>

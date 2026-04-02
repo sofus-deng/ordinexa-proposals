@@ -1,7 +1,7 @@
 /**
  * Budget Calculation Module (ORDX-013B)
  *
- * Deterministic budget calculation logic for interior fit-out projects.
+ * Deterministic budget calculation logic for cross-industry proposal engagements.
  * All calculations are pure functions with no side effects.
  */
 
@@ -18,20 +18,20 @@ import {
 } from "./repository";
 
 /**
- * Calculates the area-based adjustment factor.
+ * Calculates the scope-size adjustment factor.
  *
  * Logic:
- * - Baseline (50 ping) = factor of 1.0
- * - Smaller projects have reduced factor (economies of scale work in reverse)
- * - Larger projects have increased factor (more complexity)
+ * - Baseline (50 units) = factor of 1.0
+ * - Smaller scopes have reduced factor
+ * - Larger scopes have increased factor
  * - Factor is clamped between min and max thresholds
  *
- * @param areaPing - Project area in ping
- * @returns Area adjustment factor
+ * @param scopeSize - Relative scope size
+ * @returns Scope-size adjustment factor
  */
-export function calculateAreaFactor(areaPing: number): number {
-  const deltaPing = areaPing - AREA_THRESHOLDS.baselinePing;
-  const factorAdjustment = (deltaPing / 10) * AREA_THRESHOLDS.factorPerTenPing;
+export function calculateAreaFactor(scopeSize: number): number {
+  const deltaPing = scopeSize - AREA_THRESHOLDS.baselineSize;
+  const factorAdjustment = (deltaPing / 10) * AREA_THRESHOLDS.factorPerTenUnits;
   const rawFactor = 1 + factorAdjustment;
 
   return Math.max(
@@ -113,26 +113,26 @@ export function getApplicableAdjustments(
     budgetImpactValue: number;
   }> = [];
 
-  // Check each feature flag
-  if (input.includeReceptionArea) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includeReceptionArea);
+  // Check each optional service module
+  if (input.includeDiscoveryWorkshop) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeDiscoveryWorkshop);
   }
-  if (input.includePantry) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includePantry);
+  if (input.includeTrainingEnablement) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeTrainingEnablement);
   }
-  if (input.includeGlassPartitions) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includeGlassPartitions);
+  if (input.includeImplementationSupport) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeImplementationSupport);
   }
-  if (input.includeCustomStorage) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includeCustomStorage);
+  if (input.includeCustomDeliverables) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeCustomDeliverables);
   }
-  if (input.includeSmartOfficeSetup) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includeSmartOfficeSetup);
+  if (input.includeAutomationIntegration) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeAutomationIntegration);
   }
-  if (input.includeMEPWork) {
-    adjustments.push(FEATURE_ADJUSTMENTS.includeMEPWork);
+  if (input.includeComplianceReview) {
+    adjustments.push(FEATURE_ADJUSTMENTS.includeComplianceReview);
   }
-  if (input.rushProject) {
+  if (input.expeditedDelivery) {
     adjustments.push(RUSH_ADJUSTMENT);
   }
 
@@ -149,18 +149,18 @@ export function getApplicableAdjustments(
  * 4. Apply each adjustment (percentage adjustments compound, flat adds to total)
  *
  * @param baseline - Project type baseline budget range
- * @param areaPing - Project area in ping
+ * @param scopeSize - Relative scope size
  * @param styleMultiplier - Style option multiplier
  * @param input - Full estimation input for adjustment determination
  * @returns Complete budget breakdown
  */
 export function calculateBudgetBreakdown(
   baseline: BudgetRange,
-  areaPing: number,
+  scopeSize: number,
   styleMultiplier: number,
   input: EstimationInput
 ): BudgetBreakdown {
-  const areaFactor = calculateAreaFactor(areaPing);
+  const areaFactor = calculateAreaFactor(scopeSize);
   const applicableAdjustments = getApplicableAdjustments(input);
 
   // Track cumulative adjustments
@@ -290,7 +290,7 @@ export async function calculateBudget(
 
   const breakdown = calculateBudgetBreakdown(
     baseline,
-    input.areaPing,
+    input.scopeSize,
     styleOption.multiplier,
     input
   );

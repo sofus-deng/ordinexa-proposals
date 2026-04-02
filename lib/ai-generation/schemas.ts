@@ -9,8 +9,8 @@ import type {
   GeneratedProposalContent,
   ExecutiveSummary,
   ProjectUnderstanding,
-  DesignDirection,
-  SpatialPlanningRecommendations,
+  ProposedApproach,
+  ScopeRecommendations,
   BudgetNarrative,
   TimelineNarrative,
   RisksAndAssumptions,
@@ -149,9 +149,9 @@ function validateProjectUnderstanding(
     valid = false;
   }
 
-  if (!isNonEmptyString(obj.spatialRequirements)) {
+  if (!isNonEmptyString(obj.operationalNeeds)) {
     errors.push({
-      path: "projectUnderstanding.spatialRequirements",
+      path: "projectUnderstanding.operationalNeeds",
       message: "Must be a non-empty string",
     });
     valid = false;
@@ -174,50 +174,50 @@ function validateProjectUnderstanding(
 function validateDesignDirection(
   data: unknown,
   errors: ValidationError[]
-): data is DesignDirection {
+): data is ProposedApproach {
   if (typeof data !== "object" || data === null) {
-    errors.push({ path: "designDirection", message: "Must be an object" });
+    errors.push({ path: "proposedApproach", message: "Must be an object" });
     return false;
   }
 
   const obj = data as Record<string, unknown>;
   let valid = true;
 
-  if (!isNonEmptyString(obj.philosophy)) {
+  if (!isNonEmptyString(obj.approachSummary)) {
     errors.push({
-      path: "designDirection.philosophy",
+      path: "proposedApproach.approachSummary",
       message: "Must be a non-empty string",
     });
     valid = false;
   }
 
-  if (!isStringArray(obj.materialsFinishes)) {
+  if (!isStringArray(obj.workstreams)) {
     errors.push({
-      path: "designDirection.materialsFinishes",
+      path: "proposedApproach.workstreams",
       message: "Must be an array of non-empty strings",
     });
     valid = false;
   }
 
-  if (!isNonEmptyString(obj.colorPalette)) {
+  if (!isNonEmptyString(obj.engagementModel)) {
     errors.push({
-      path: "designDirection.colorPalette",
+      path: "proposedApproach.engagementModel",
       message: "Must be a non-empty string",
     });
     valid = false;
   }
 
-  if (!isNonEmptyString(obj.lightingApproach)) {
+  if (!isNonEmptyString(obj.deliveryApproach)) {
     errors.push({
-      path: "designDirection.lightingApproach",
+      path: "proposedApproach.deliveryApproach",
       message: "Must be a non-empty string",
     });
     valid = false;
   }
 
-  if (!isStringArray(obj.furnitureEquipment)) {
+  if (!isStringArray(obj.capabilityEnablers)) {
     errors.push({
-      path: "designDirection.furnitureEquipment",
+      path: "proposedApproach.capabilityEnablers",
       message: "Must be an array of non-empty strings",
     });
     valid = false;
@@ -272,10 +272,10 @@ function validateSpatialRecommendation(
 function validateSpatialPlanningRecommendations(
   data: unknown,
   errors: ValidationError[]
-): data is SpatialPlanningRecommendations {
+): data is ScopeRecommendations {
   if (typeof data !== "object" || data === null) {
     errors.push({
-      path: "spatialPlanningRecommendations",
+      path: "scopeRecommendations",
       message: "Must be an object",
     });
     return false;
@@ -286,7 +286,7 @@ function validateSpatialPlanningRecommendations(
 
   if (!isNonEmptyString(obj.overallStrategy)) {
     errors.push({
-      path: "spatialPlanningRecommendations.overallStrategy",
+      path: "scopeRecommendations.overallStrategy",
       message: "Must be a non-empty string",
     });
     valid = false;
@@ -294,7 +294,7 @@ function validateSpatialPlanningRecommendations(
 
   if (!Array.isArray(obj.areaRecommendations)) {
     errors.push({
-      path: "spatialPlanningRecommendations.areaRecommendations",
+      path: "scopeRecommendations.areaRecommendations",
       message: "Must be an array",
     });
     valid = false;
@@ -303,7 +303,7 @@ function validateSpatialPlanningRecommendations(
       if (
         !validateSpatialRecommendation(
           item,
-          `spatialPlanningRecommendations.areaRecommendations[${index}]`,
+          `scopeRecommendations.areaRecommendations[${index}]`,
           errors
         )
       ) {
@@ -314,7 +314,7 @@ function validateSpatialPlanningRecommendations(
 
   if (!isNonEmptyString(obj.circulationFlow)) {
     errors.push({
-      path: "spatialPlanningRecommendations.circulationFlow",
+      path: "scopeRecommendations.circulationFlow",
       message: "Must be a non-empty string",
     });
     valid = false;
@@ -322,7 +322,7 @@ function validateSpatialPlanningRecommendations(
 
   if (!isNonEmptyString(obj.flexibilityConsiderations)) {
     errors.push({
-      path: "spatialPlanningRecommendations.flexibilityConsiderations",
+      path: "scopeRecommendations.flexibilityConsiderations",
       message: "Must be a non-empty string",
     });
     valid = false;
@@ -672,8 +672,8 @@ export function validateGeneratedContent(
 
   validateExecutiveSummary(obj.executiveSummary, errors);
   validateProjectUnderstanding(obj.projectUnderstanding, errors);
-  validateDesignDirection(obj.designDirection, errors);
-  validateSpatialPlanningRecommendations(obj.spatialPlanningRecommendations, errors);
+  validateDesignDirection(obj.proposedApproach, errors);
+  validateSpatialPlanningRecommendations(obj.scopeRecommendations, errors);
   validateBudgetNarrative(obj.budgetNarrative, errors);
   validateTimelineNarrative(obj.timelineNarrative, errors);
   validateRisksAndAssumptions(obj.risksAndAssumptions, errors);
@@ -757,17 +757,17 @@ export function createFallbackContent(
     projectUnderstanding: partialContent?.projectUnderstanding ?? {
       businessContext: "Content generation failed.",
       objectives: ["Regenerate proposal to populate content."],
-      spatialRequirements: "Content generation failed.",
+      operationalNeeds: "Content generation failed.",
       constraints: ["Technical error occurred during generation."],
     },
-    designDirection: partialContent?.designDirection ?? {
-      philosophy: "Content generation failed.",
-      materialsFinishes: ["Regenerate to populate."],
-      colorPalette: "Content generation failed.",
-      lightingApproach: "Content generation failed.",
-      furnitureEquipment: ["Regenerate to populate."],
+    proposedApproach: partialContent?.proposedApproach ?? {
+      approachSummary: "Content generation failed.",
+      workstreams: ["Regenerate to populate."],
+      engagementModel: "Content generation failed.",
+      deliveryApproach: "Content generation failed.",
+      capabilityEnablers: ["Regenerate to populate."],
     },
-    spatialPlanningRecommendations: partialContent?.spatialPlanningRecommendations ?? {
+    scopeRecommendations: partialContent?.scopeRecommendations ?? {
       overallStrategy: "Content generation failed.",
       areaRecommendations: [
         {

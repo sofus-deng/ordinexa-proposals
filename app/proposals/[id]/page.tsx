@@ -25,15 +25,16 @@ import type { GeneratedProposalContent, ProposalGenerationInput } from "@/types/
 async function getProposalEstimate(proposal: {
   projectTypeId: string;
   styleOptionId: string;
-  areaPing: number;
-  meetingRoomCount: number;
-  includeReceptionArea: boolean;
-  includePantry: boolean;
-  includeGlassPartitions: boolean;
-  includeCustomStorage: boolean;
-  includeSmartOfficeSetup: boolean;
-  includeMEPWork: boolean;
-  rushProject: boolean;
+  scopeSize: number;
+  complexityLevel: number;
+  stakeholderCount: number;
+  includeDiscoveryWorkshop: boolean;
+  includeTrainingEnablement: boolean;
+  includeImplementationSupport: boolean;
+  includeCustomDeliverables: boolean;
+  includeAutomationIntegration: boolean;
+  includeComplianceReview: boolean;
+  expeditedDelivery: boolean;
 }): Promise<EstimateSummary | null> {
   const repository = createMockPricingRepository();
   const input = proposalToEstimationInput(proposal);
@@ -63,15 +64,16 @@ function buildAIGenerationInput(
     scope: string[];
     projectTypeId: string;
     styleOptionId: string;
-    areaPing: number;
-    meetingRoomCount: number;
-    includeReceptionArea: boolean;
-    includePantry: boolean;
-    includeGlassPartitions: boolean;
-    includeCustomStorage: boolean;
-    includeSmartOfficeSetup: boolean;
-    includeMEPWork: boolean;
-    rushProject: boolean;
+    scopeSize: number;
+    complexityLevel: number;
+    stakeholderCount: number;
+    includeDiscoveryWorkshop: boolean;
+    includeTrainingEnablement: boolean;
+    includeImplementationSupport: boolean;
+    includeCustomDeliverables: boolean;
+    includeAutomationIntegration: boolean;
+    includeComplianceReview: boolean;
+    expeditedDelivery: boolean;
   },
   estimate: EstimateSummary
 ): ProposalGenerationInput {
@@ -88,8 +90,9 @@ function buildAIGenerationInput(
       scope: proposal.scope,
     },
     estimationContext: {
-      areaPing: proposal.areaPing,
-      meetingRoomCount: proposal.meetingRoomCount,
+      scopeSize: proposal.scopeSize,
+      complexityLevel: estimate.input.complexityLevel,
+      stakeholderCount: proposal.stakeholderCount,
       includedOptions,
       budgetRange: {
         min: estimate.budget.final.min,
@@ -101,15 +104,15 @@ function buildAIGenerationInput(
         maxWeeks: estimate.timeline.final.maxWeeks,
       },
       styleMultiplier: estimate.styleOption.multiplier,
-      isRushProject: proposal.rushProject,
+      isExpeditedDelivery: proposal.expeditedDelivery,
     },
-    fitOutOptions: {
-      includeReceptionArea: proposal.includeReceptionArea,
-      includePantry: proposal.includePantry,
-      includeGlassPartitions: proposal.includeGlassPartitions,
-      includeCustomStorage: proposal.includeCustomStorage,
-      includeSmartOfficeSetup: proposal.includeSmartOfficeSetup,
-      includeMEPWork: proposal.includeMEPWork,
+    serviceModules: {
+      includeDiscoveryWorkshop: proposal.includeDiscoveryWorkshop,
+      includeTrainingEnablement: proposal.includeTrainingEnablement,
+      includeImplementationSupport: proposal.includeImplementationSupport,
+      includeCustomDeliverables: proposal.includeCustomDeliverables,
+      includeAutomationIntegration: proposal.includeAutomationIntegration,
+      includeComplianceReview: proposal.includeComplianceReview,
     },
   };
 }
@@ -207,9 +210,9 @@ function AIProjectUnderstanding({ content }: { content: GeneratedProposalContent
         </div>
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Spatial Requirements
+            Operational Needs
           </h4>
-          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.spatialRequirements}</p>
+          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.operationalNeeds}</p>
         </div>
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -225,39 +228,39 @@ function AIProjectUnderstanding({ content }: { content: GeneratedProposalContent
 /**
  * Renders the design direction section.
  */
-function AIDesignDirection({ content }: { content: GeneratedProposalContent["designDirection"] }) {
+function AIDesignDirection({ content }: { content: GeneratedProposalContent["proposedApproach"] }) {
   return (
-    <Card title="Design Direction" eyebrow="Recommended approach">
+    <Card title="Proposed Approach" eyebrow="Recommended approach">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Philosophy
+            Approach Summary
           </h4>
-          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.philosophy}</p>
+          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.approachSummary}</p>
         </div>
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Materials & Finishes
+            Workstreams
           </h4>
-          <BulletList items={content.materialsFinishes} />
+          <BulletList items={content.workstreams} />
         </div>
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Color Palette
+            Engagement Model
           </h4>
-          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.colorPalette}</p>
+          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.engagementModel}</p>
         </div>
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Lighting Approach
+            Delivery Approach
           </h4>
-          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.lightingApproach}</p>
+          <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.deliveryApproach}</p>
         </div>
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Furniture & Equipment
+            Capability Enablers
           </h4>
-          <BulletList items={content.furnitureEquipment} />
+          <BulletList items={content.capabilityEnablers} />
         </div>
       </div>
     </Card>
@@ -267,9 +270,9 @@ function AIDesignDirection({ content }: { content: GeneratedProposalContent["des
 /**
  * Renders the spatial planning section.
  */
-function AISpatialPlanning({ content }: { content: GeneratedProposalContent["spatialPlanningRecommendations"] }) {
+function AISpatialPlanning({ content }: { content: GeneratedProposalContent["scopeRecommendations"] }) {
   return (
-    <Card title="Spatial Planning" eyebrow="Recommendations">
+    <Card title="Scope Recommendations" eyebrow="Recommendations">
       <div className="space-y-5">
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
@@ -279,7 +282,7 @@ function AISpatialPlanning({ content }: { content: GeneratedProposalContent["spa
         </div>
         <div>
           <h4 className="mb-3 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Area Recommendations
+            Scope Recommendations
           </h4>
           <div className="space-y-3">
             {content.areaRecommendations.map((rec, index) => (
@@ -296,7 +299,7 @@ function AISpatialPlanning({ content }: { content: GeneratedProposalContent["spa
         </div>
         <div>
           <h4 className="mb-2 text-[var(--text-xs)] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-            Circulation & Flow
+            Coordination Approach
           </h4>
           <p className="text-[var(--text-sm)] leading-7 text-[var(--color-text-secondary)]">{content.circulationFlow}</p>
         </div>
@@ -494,15 +497,16 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
       dueDate: proposalRecord.dueDate,
       projectTypeId: proposalRecord.estimationInput.projectTypeId,
       styleOptionId: proposalRecord.estimationInput.styleMultiplierId,
-      areaPing: proposalRecord.estimationInput.areaPing,
-      meetingRoomCount: proposalRecord.estimationInput.meetingRoomCount,
-      includeReceptionArea: proposalRecord.estimationInput.includeReceptionArea,
-      includePantry: proposalRecord.estimationInput.includePantry,
-      includeGlassPartitions: proposalRecord.estimationInput.includeGlassPartitions,
-      includeCustomStorage: proposalRecord.estimationInput.includeCustomStorage,
-      includeSmartOfficeSetup: proposalRecord.estimationInput.includeSmartOfficeSetup,
-      includeMEPWork: proposalRecord.estimationInput.includeMEPWork,
-      rushProject: proposalRecord.estimationInput.rushProject,
+      scopeSize: proposalRecord.estimationInput.scopeSize,
+      complexityLevel: proposalRecord.estimationInput.complexityLevel,
+      stakeholderCount: proposalRecord.estimationInput.stakeholderCount,
+      includeDiscoveryWorkshop: proposalRecord.estimationInput.includeDiscoveryWorkshop,
+      includeTrainingEnablement: proposalRecord.estimationInput.includeTrainingEnablement,
+      includeImplementationSupport: proposalRecord.estimationInput.includeImplementationSupport,
+      includeCustomDeliverables: proposalRecord.estimationInput.includeCustomDeliverables,
+      includeAutomationIntegration: proposalRecord.estimationInput.includeAutomationIntegration,
+      includeComplianceReview: proposalRecord.estimationInput.includeComplianceReview,
+      expeditedDelivery: proposalRecord.estimationInput.expeditedDelivery,
       estimate: {
         subtotal: proposalRecord.estimationResult.budget.final.min,
         adjustmentTotal: proposalRecord.estimationResult.budget.adjustmentsImpact.min,
@@ -536,7 +540,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
       <div className="space-y-8">
         <PageHeader
           title={proposal.title}
-          description="Complete proposal with detailed estimates and project recommendations."
+          description="Complete proposal with detailed estimates and engagement recommendations."
           action={
             <div className="flex gap-3">
               <ButtonLink href={`/proposals/${id}/export`} variant="primary">Export</ButtonLink>
@@ -556,10 +560,10 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                 <AIProjectUnderstanding content={aiContent.projectUnderstanding} />
 
                 {/* AI-Generated Design Direction */}
-                <AIDesignDirection content={aiContent.designDirection} />
+                <AIDesignDirection content={aiContent.proposedApproach} />
 
                 {/* AI-Generated Spatial Planning */}
-                <AISpatialPlanning content={aiContent.spatialPlanningRecommendations} />
+                <AISpatialPlanning content={aiContent.scopeRecommendations} />
 
                 {/* AI-Generated Budget Narrative */}
                 <AIBudgetNarrative content={aiContent.budgetNarrative} />
@@ -587,7 +591,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             </SectionBlock>
 
             {/* Original Fit-out Options */}
-            <Card title="Fit-out options" eyebrow="Included features">
+            <Card title="Service modules" eyebrow="Included modules">
               {includedOptions.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {includedOptions.map((option) => (
@@ -601,7 +605,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                 </div>
               ) : (
                 <p className="text-[var(--text-sm)] text-[var(--color-text-muted)]">
-                  No additional fit-out options selected.
+                  No additional service modules selected.
                 </p>
               )}
             </Card>
@@ -622,7 +626,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span>Area impact ({estimate.input.areaPing} ping)</span>
+                     <span>Scope-size impact ({estimate.input.scopeSize} units)</span>
                     <span className={`font-semibold ${estimate.budget.areaImpact >= 0 ? "text-[var(--color-text-primary)]" : "text-green-600"}`}>
                       {estimate.budget.areaImpact >= 0 ? "+" : ""}{Math.round(estimate.budget.areaImpact * 100)}%
                     </span>
@@ -685,7 +689,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                   )}
                   {estimate.timeline.rushCompression > 0 && (
                     <div className="flex items-center justify-between">
-                      <span>Rush compression</span>
+                      <span>Expedited compression</span>
                       <span className="font-semibold text-green-600">
                         -{Math.round(estimate.timeline.rushCompression * 100)}%
                       </span>
@@ -703,13 +707,14 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             </Card>
 
             {/* Project Details */}
-            <Card title="Project details" eyebrow="Overview">
+            <Card title="Engagement details" eyebrow="Overview">
               <div className="space-y-3 text-[var(--text-sm)] leading-6 text-[var(--color-text-secondary)]">
                 <p>Created {formatDate(proposal.createdAt)}</p>
                 <p>Last updated {formatDate(proposal.updatedAt)}</p>
                 <p>Industry: {proposal.industry}</p>
-                <p>Area: {proposal.areaPing} ping</p>
-                <p>Meeting rooms: {proposal.meetingRoomCount}</p>
+                <p>Scope size: {proposal.scopeSize}</p>
+                <p>Complexity level: {proposal.complexityLevel}</p>
+                <p>Stakeholders: {proposal.stakeholderCount}</p>
               </div>
             </Card>
           </div>
