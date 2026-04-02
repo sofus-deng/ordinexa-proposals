@@ -17,7 +17,7 @@ Build a professional, premium, light-first B2B interface that enables:
 - B2B sales teams
 - Proposal managers
 - Business development professionals
-- Agency account managers
+- Account managers
 
 ## Core Modules
 
