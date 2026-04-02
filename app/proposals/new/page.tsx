@@ -174,22 +174,15 @@ type ProviderOption = AIGenerationConfig["provider"];
 const providerOptions: Array<{ value: ProviderOption; label: string; description: string }> = [
   {
     value: "gemini",
-    label: "Gemini AI",
-    description: "AI-powered proposal generation with smart fallback for demos.",
+    label: "Live generation",
+    description: "Smart proposal generation with demo fallback.",
   },
   {
     value: "mock",
-    label: "Demo preview",
-    description: "Deterministic content for consistent demo presentations.",
+    label: "Demo generation",
+    description: "Deterministic content for consistent presentations.",
   },
 ];
-
-function toTitleCase(value: string): string {
-  return value
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
 
 function getSelectedScopeLabels(input: EstimationInput): string[] {
   return [
@@ -928,7 +921,7 @@ export default function NewProposalPage() {
                                 : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
                             }`}
                           >
-                            {option.value === "gemini" ? "AI" : "Demo"}
+                            {option.value === "gemini" ? "Live" : "Demo"}
                           </span>
                         </div>
                       </button>
@@ -965,7 +958,7 @@ export default function NewProposalPage() {
                             ? "text-emerald-800"
                             : "text-amber-800"
                         }`}>
-                          {providerStatus.isAvailable ? "Ready to generate" : "Demo mode"}
+                          {providerStatus.isAvailable ? "Ready to generate" : "Demo available"}
                         </p>
                         <p className={`mt-1 text-[var(--text-xs)] leading-5 ${
                           providerStatus.isAvailable
@@ -1000,43 +993,53 @@ export default function NewProposalPage() {
 
               {/* Action buttons with clear hierarchy */}
               <div className="space-y-3">
-                {/* Primary actions - grouped together */}
+                {/* Primary action - contextually shown */}
                 <div className="flex flex-wrap items-center gap-3">
                   {!estimate ? (
                     <Button type="submit" disabled={isCalculating}>
                       {isCalculating ? "Calculating..." : "Generate estimate"}
                     </Button>
+                  ) : !generatedProposal ? (
+                    <Button
+                      type="button"
+                      onClick={handleGenerateProposal}
+                      disabled={isGeneratingProposal}
+                    >
+                      {isGeneratingProposal ? "Generating..." : "Generate proposal preview"}
+                    </Button>
                   ) : (
-                    <>
-                      <Button
-                        type="button"
-                        onClick={handleGenerateProposal}
-                        disabled={isGeneratingProposal}
-                      >
-                        {isGeneratingProposal ? "Generating..." : "Generate proposal preview"}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={handleCalculateEstimate}
-                        disabled={isCalculating}
-                      >
-                        {isCalculating ? "Recalculating..." : "Recalculate estimate"}
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={handleSaveProposal}
-                        disabled={isSaving || !generatedProposal}
-                        variant={generatedProposal ? "primary" : "secondary"}
-                      >
-                        {isSaving ? "Saving..." : "Save proposal"}
-                      </Button>
-                    </>
+                    <Button
+                      type="button"
+                      onClick={handleSaveProposal}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? "Saving..." : "Save proposal"}
+                    </Button>
                   )}
                 </div>
 
-                {/* Secondary action */}
-                <div className="flex gap-3">
+                {/* Secondary actions - shown when contextually relevant */}
+                <div className="flex flex-wrap items-center gap-3">
+                  {estimate && !generatedProposal && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleCalculateEstimate}
+                      disabled={isCalculating}
+                    >
+                      {isCalculating ? "Recalculating..." : "Recalculate estimate"}
+                    </Button>
+                  )}
+                  {estimate && generatedProposal && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleCalculateEstimate}
+                      disabled={isCalculating}
+                    >
+                      {isCalculating ? "Recalculating..." : "Recalculate estimate"}
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     variant="ghost"
@@ -1192,7 +1195,7 @@ export default function NewProposalPage() {
                         {estimate.input.includedOptions.map((option) => (
                           <span
                             key={option}
-                            className="inline-flex items-center rounded-full bg-[var(--color-accent-subtle)] px-3 py-1 text-[var(--text-xs)] font-medium text-[var(--color-accent)]"
+                            className="inline-flex items-center rounded-md bg-[var(--color-surface-muted)] px-3 py-1.5 text-[var(--text-xs)] font-medium text-[var(--color-text-primary)]"
                           >
                             {option}
                           </span>
@@ -1242,11 +1245,11 @@ export default function NewProposalPage() {
                           Proposal ready for review
                         </p>
                         <p className="mt-2 text-[var(--text-xs)] text-[var(--color-text-secondary)]">
-                          Source: {toTitleCase(generatedProposal.metadata.provider)} · {generatedProposal.metadata.modelUsed}
+                          {actualProviderUsed === "mock" ? "Demo generation" : "Live generation"}
                         </p>
                         {actualProviderUsed === "mock" && (
                           <p className="mt-2 text-[var(--text-xs)] text-amber-700">
-                            <span className="font-semibold">Demo mode:</span> This proposal was generated using demo content for presentation purposes.
+                            This proposal uses demo content for presentation purposes.
                           </p>
                         )}
                       </div>

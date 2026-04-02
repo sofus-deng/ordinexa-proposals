@@ -36,7 +36,7 @@ export async function checkGeminiStatus(): Promise<ProviderStatus> {
     if (available) {
       return {
         isAvailable: true,
-        message: "Gemini AI is available and ready for proposal generation.",
+        message: "Live generation is ready for proposal creation.",
         provider: "gemini",
         isFallback: false,
       };
@@ -44,14 +44,14 @@ export async function checkGeminiStatus(): Promise<ProviderStatus> {
 
     return {
       isAvailable: false,
-      message: "Gemini AI is unavailable. Using mock provider for demo purposes.",
+      message: "Demo generation is available for proposal creation.",
       provider: "mock",
       isFallback: true,
     };
   } catch {
     return {
       isAvailable: false,
-      message: "Gemini AI is unavailable. Using mock provider for demo purposes.",
+      message: "Demo generation is available for proposal creation.",
       provider: "mock",
       isFallback: true,
     };
@@ -96,13 +96,13 @@ export function getProviderStatusBadge(status: ProviderStatus): {
 } {
   if (status.isAvailable) {
     return {
-      text: "Gemini AI active",
+      text: "Live generation",
       variant: "success",
     };
   }
 
   return {
-    text: "Demo mode (mock)",
+    text: "Demo generation",
     variant: "warning",
   };
 }
